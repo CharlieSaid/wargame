@@ -38,6 +38,7 @@ CREATE TABLE weapons (
     name VARCHAR(50) NOT NULL UNIQUE,
     damage INTEGER DEFAULT 0,
     damage_type VARCHAR(20),
+    range INTEGER DEFAULT 0,
     description VARCHAR(1000)
 );
 
