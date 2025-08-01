@@ -16,7 +16,8 @@ CREATE TABLE races (
 CREATE TABLE classes (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL UNIQUE,
-    skill VARCHAR(50) NOT NULL
+    skill VARCHAR(50),
+    description VARCHAR(1000)
 );
 
 -- Armors table: Each armor that a unit can use
