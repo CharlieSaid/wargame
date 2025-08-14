@@ -1,0 +1,14 @@
+# Environment variables - NEVER commit these!
+.env
+*.env
+
+# Virtual environment
+venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+
+# macOS system files
+.DS_Store 

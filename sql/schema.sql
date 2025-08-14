@@ -43,7 +43,7 @@ CREATE TABLE weapons (
     description VARCHAR(1000)
 );
 
--- Users table: Stores information about users who own armies
+-- Users table: Stores information about users who own squads
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
@@ -51,8 +51,8 @@ CREATE TABLE users (
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
--- Armies table: Each army belongs to one user
-CREATE TABLE armies (
+-- Squads table: Each squad belongs to one user
+CREATE TABLE squads (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     name VARCHAR(100) NOT NULL,
@@ -60,10 +60,10 @@ CREATE TABLE armies (
     description VARCHAR(1000)
 );
 
--- Units table: Each unit belongs to one army
+-- Units table: Each unit belongs to one squad
 CREATE TABLE units (
     id SERIAL PRIMARY KEY,
-    army_id INTEGER NOT NULL REFERENCES armies(id) ON DELETE CASCADE,
+    squad_id INTEGER NOT NULL REFERENCES squads(id) ON DELETE CASCADE,
     name VARCHAR(100) NOT NULL,
     race VARCHAR(50) REFERENCES races(name),
     class VARCHAR(50) NOT NULL REFERENCES classes(name),
@@ -75,8 +75,8 @@ CREATE TABLE units (
 );
 
 -- PostgreSQL indexes for better query performance
-CREATE INDEX idx_armies_user_id ON armies(user_id);
-CREATE INDEX idx_units_army_id ON units(army_id);
+CREATE INDEX idx_squads_user_id ON squads(user_id);
+CREATE INDEX idx_units_squad_id ON units(squad_id);
 CREATE INDEX idx_units_race ON units(race);
 CREATE INDEX idx_units_class ON units(class);
 CREATE INDEX idx_units_armor ON units(armor);
