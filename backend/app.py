@@ -6,8 +6,9 @@ from dotenv import load_dotenv
 import os
 
 app = Flask(__name__)
+
 # Enable CORS for the GitHub Pages origin
-CORS(app, resources={r"/api/*": {"origins": "https://<your-username>.github.io"}})
+CORS(app, resources={r"/api/*": {"origins": "https://<your-username>.github.io"}}) 
 
 # Load environment variables
 load_dotenv()

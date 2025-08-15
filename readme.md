@@ -27,3 +27,5 @@ I have several sql files:
  - data.sql: Inserts starting data.
  - rebuild.sql: Runs cleanup.sql and then schema.sql.  Then runs data.sql.  This basically resets the database.  NOTE that it restores the data to whatever data.sql inserts.  Manually inserted data would get deleted.
 
+Render:
+Render is on a free tier, meaning that services get put on the back burner after 15 minutes.  If they are loaded in this state, there may be a minute of waiting first.
