@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medieval Army Game</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input, button { padding: 5px; margin-right: 10px; }
+        #output { white-space: pre-wrap; background: #f5f5f5; padding: 10px; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <h1>Medieval Army Game</h1>
+
+    <h2>Create User</h2>
+    <div class="form-group">
+        <label for="username">Username:</label>
+        <input type="text" id="username" required>
+        <label for="email">Email:</label>
+        <input type="email" id="email" required>
+        <button onclick="createUser()">Create User</button>
+    </div>
+
+    <h2>Create Army</h2>
+    <div class="form-group">
+        <label for="userId">User ID:</label>
+        <input type="number" id="userId" required>
+        <label for="armyName">Army Name:</label>
+        <input type="text" id="armyName" required>
+        <label for="description">Description:</label>
+        <input type="text" id="description">
+        <button onclick="createArmy()">Create Army</button>
+    </div>
+
+    <h2>Your Armies</h2>
+    <div class="form-group">
+        <label for="listUserId">User ID:</label>
+        <input type="number" id="listUserId" required>
+        <button onclick="listArmies()">List Armies</button>
+    </div>
+    <pre id="output"></pre>
+
+    <script>
+        const apiUrl = "https://wargame-mbpq.onrender.com/api"; // Replace with your Render URL
+
+        function createUser() {
+            const username = document.getElementById("username").value;
+            const email = document.getElementById("email").value;
+            fetch(`${apiUrl}/users`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, email })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+                document.getElementById("username").value = "";
+                document.getElementById("email").value = "";
+            })
+            .catch(error => document.getElementById("output").textContent = `Error: ${error}`);
+        }
+
+        function createArmy() {
+            const userId = document.getElementById("userId").value;
+            const armyName = document.getElementById("armyName").value;
+            const description = document.getElementById("description").value;
+            fetch(`${apiUrl}/squads`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user_id: userId, army_name: armyName, description })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+                document.getElementById("userId").value = "";
+                document.getElementById("armyName").value = "";
+                document.getElementById("description").value = "";
+            })
+            .catch(error => document.getElementById("output").textContent = `Error: ${error}`);
+        }
+
+        function listArmies() {
+            const userId = document.getElementById("listUserId").value;
+            fetch(`${apiUrl}/users/${userId}/squads`, {
+                method: "GET"
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+                document.getElementById("listUserId").value = "";
+            })
+            .catch(error => document.getElementById("output").textContent = `Error: ${error}`);
+        }
+    </script>
+</body>
+</html>
