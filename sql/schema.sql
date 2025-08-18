@@ -8,6 +8,8 @@ CREATE TABLE races (
     skill VARCHAR(50) NOT NULL,
     base_HP INTEGER DEFAULT 100,
     base_speed INTEGER DEFAULT 10,
+    base_agility INTEGER DEFAULT 100, -- both accuracy of own attacks and evasion of enemy attacks
+    base_damage INTEGER DEFAULT 10,  -- modifier to damage of own attacks
     description VARCHAR(1000)
 );
 
@@ -48,6 +50,8 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) UNIQUE,
+    password_hash VARCHAR(100) NOT NULL,
+    colors JSONB,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 

@@ -29,3 +29,4 @@ I have several sql files:
 
 Render:
 Render is on a free tier, meaning that services get put on the back burner after 15 minutes.  If they are loaded in this state, there may be a minute of waiting first.
+

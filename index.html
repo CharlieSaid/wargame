@@ -3,97 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medieval Army Game</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; }
-        input, button { padding: 5px; margin-right: 10px; }
-        #output { white-space: pre-wrap; background: #f5f5f5; padding: 10px; border: 1px solid #ddd; }
-    </style>
+    <title>⚔️ Medieval Wargame ⚔️</title>
+    <link rel="stylesheet" href="frontend/styles.css">
 </head>
 <body>
-    <h1>Medieval Army Game</h1>
+    <!-- Top Banner Header -->
+    <header class="top-banner">
+        <div class="banner-left">
+            <h1 class="site-title">Wargame</h1>
+        </div>
+        <div class="banner-right">
+            <span class="user-info">⚔️ Sir Placeholder the Bold</span>
+        </div>
+    </header>
 
-    <h2>Create User</h2>
-    <div class="form-group">
-        <label for="username">Username:</label>
-        <input type="text" id="username" required>
-        <label for="email">Email:</label>
-        <input type="email" id="email" required>
-        <button onclick="createUser()">Create User</button>
+    <div class="scroll-container">
+        
+        <!-- Create Warrior Section -->
+        <section class="form-section">
+            <h2>🏰 Recruit a Warrior</h2>
+            <form id="user-form">
+                <div class="form-group">
+                    <label for="username">Warrior Name:</label>
+                    <input type="text" id="username" placeholder="Enter your warrior's name..." required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Herald's Message (Email):</label>
+                    <input type="email" id="email" placeholder="warrior@realm.com" required>
+                </div>
+                <button type="button" id="create-user-btn" class="btn">⚔️ Join the Realm</button>
+            </form>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- Create Squad Section -->
+        <section class="form-section">
+            <h2>🛡️ Assemble a Squad</h2>
+            <form id="squad-form">
+                <div class="form-group">
+                    <label for="userId">Warrior ID:</label>
+                    <input type="number" id="userId" placeholder="Enter warrior ID..." required>
+                </div>
+                <div class="form-group">
+                    <label for="squadName">Squad Name:</label>
+                    <input type="text" id="squadName" placeholder="Name your mighty squad..." required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Squad Description:</label>
+                    <input type="text" id="description" placeholder="Describe your squad's purpose...">
+                </div>
+                <button type="button" id="create-squad-btn" class="btn">⚔️ Assemble Squad</button>
+            </form>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- List Squads Section -->
+        <section class="form-section">
+            <h2>📜 View Your Squads</h2>
+            <form id="list-form">
+                <div class="form-group">
+                    <label for="listUserId">Warrior ID:</label>
+                    <input type="number" id="listUserId" placeholder="Enter warrior ID..." required>
+                </div>
+                <button type="button" id="list-squads-btn" class="btn">🔍 View Squads</button>
+            </form>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- Battle Log Section -->
+        <section>
+            <h2>📜 Battle Log</h2>
+            <div class="output-scroll" id="output">
+                Awaiting your commands, brave warrior...
+            </div>
+            <button type="button" id="clear-output-btn" class="btn">🧹 Clear Log</button>
+        </section>
     </div>
 
-    <h2>Create Army</h2>
-    <div class="form-group">
-        <label for="userId">User ID:</label>
-        <input type="number" id="userId" required>
-        <label for="armyName">Army Name:</label>
-        <input type="text" id="armyName" required>
-        <label for="description">Description:</label>
-        <input type="text" id="description">
-        <button onclick="createArmy()">Create Army</button>
-    </div>
-
-    <h2>Your Armies</h2>
-    <div class="form-group">
-        <label for="listUserId">User ID:</label>
-        <input type="number" id="listUserId" required>
-        <button onclick="listArmies()">List Armies</button>
-    </div>
-    <pre id="output"></pre>
-
-    <script>
-        const apiUrl = "https://wargame-mbpq.onrender.com/api"; // Replace with your Render URL
-
-        function createUser() {
-            const username = document.getElementById("username").value;
-            const email = document.getElementById("email").value;
-            fetch(`${apiUrl}/users`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, email })
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("output").textContent = JSON.stringify(data, null, 2);
-                document.getElementById("username").value = "";
-                document.getElementById("email").value = "";
-            })
-            .catch(error => document.getElementById("output").textContent = `Error: ${error}`);
-        }
-
-        function createArmy() {
-            const userId = document.getElementById("userId").value;
-            const armyName = document.getElementById("armyName").value;
-            const description = document.getElementById("description").value;
-            fetch(`${apiUrl}/squads`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ user_id: userId, army_name: armyName, description })
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("output").textContent = JSON.stringify(data, null, 2);
-                document.getElementById("userId").value = "";
-                document.getElementById("armyName").value = "";
-                document.getElementById("description").value = "";
-            })
-            .catch(error => document.getElementById("output").textContent = `Error: ${error}`);
-        }
-
-        function listArmies() {
-            const userId = document.getElementById("listUserId").value;
-            fetch(`${apiUrl}/users/${userId}/squads`, {
-                method: "GET"
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("output").textContent = JSON.stringify(data, null, 2);
-                document.getElementById("listUserId").value = "";
-            })
-            .catch(error => document.getElementById("output").textContent = `Error: ${error}`);
-        }
-    </script>
+    <script src="frontend/script.js"></script>
 </body>
 </html>
