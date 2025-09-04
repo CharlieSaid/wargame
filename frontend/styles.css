@@ -1,155 +1,246 @@
-/* Wargame - Simple Base Styles */
+/**
+ * WARGAME STYLES - MINIMALIST DESIGN
+ * 
+ * Simple 2-column layout: Squad list on left, creation area on right.
+ * Clean, minimal design with focus on functionality.
+ */
 
-/* Basic color scheme */
+/* ============================
+   IMPORTS & CSS VARIABLES
+   ============================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap');
+
 :root {
-    --header-red: #dc143c;
-    --background-yellow: #fef8e6;
+    /* Color scheme */
+    --primary-red: #dc143c;
+    --background-color: #fef8e6;
     --box-background: #ffffff;
     --border-color: #dc143c;
     --text-color: #333333;
-    --button-color: #dc143c;
     --button-text: #ffffff;
+    --cancel-color: #f0f0f0;
 }
 
-/* Reset and base styles */
+/* ============================
+   RESET & BASE STYLES
+   ============================ */
+
 * {
     box-sizing: border-box;
 }
 
 body {
-    font-family: Arial, sans-serif;
-    background-color: var(--background-yellow);
+    font-family: 'Cinzel', serif;
+    background-color: var(--background-color);
     margin: 0;
-    padding: 0;
+    padding: 20px;
     color: var(--text-color);
     line-height: 1.6;
 }
 
-/* Simple header banner */
-.top-banner {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 60px;
-    background-color: var(--header-red);
+/* ============================
+   MAIN 2-COLUMN LAYOUT
+   ============================ */
+
+.main-container {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 20px;
-    z-index: 1000;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 40px;
+    min-height: calc(100vh - 40px);
 }
 
-.site-title {
-    color: white;
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin: 0;
-}
-
-.user-info {
-    color: white;
-    font-size: 1rem;
-}
-
-/* Main content area */
-.scroll-container {
-    max-width: 800px;
-    margin: 80px auto 20px auto;
+.left-half,
+.right-half {
+    flex: 1;
+    background-color: var(--box-background);
+    border: 2px solid var(--border-color);
     padding: 20px;
 }
 
 /* Section headers */
 h2 {
-    background-color: var(--header-red);
+    background-color: var(--primary-red);
     color: white;
-    padding: 10px;
-    margin: 20px 0 10px 0;
+    padding: 15px;
+    margin: -20px -20px 20px -20px;
     text-align: center;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
+    font-weight: bold;
 }
 
-/* Form sections */
-.form-section {
+/* ============================
+   LEFT HALF - SQUAD LIST
+   ============================ */
+
+#squads-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.squad-box {
     background-color: var(--box-background);
-    border: 2px solid var(--border-color);
-    padding: 20px;
-    margin: 15px 0;
+    border: 1px solid var(--border-color);
+    padding: 15px;
+    transition: background-color 0.2s;
 }
 
-/* Form elements */
+.squad-box:hover {
+    background-color: #f9f9f9;
+}
+
+.squad-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 1.1rem;
+    color: var(--primary-red);
+}
+
+.squad-commander {
+    font-size: 0.9rem;
+    color: #666;
+    font-style: italic;
+    margin-bottom: 5px;
+}
+
+.squad-description {
+    font-size: 0.9rem;
+    color: #888;
+}
+
+.placeholder-content {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    padding: 40px 20px;
+}
+
+/* ============================
+   RIGHT HALF - SQUAD CREATION
+   ============================ */
+
+#create-button-container {
+    text-align: center;
+}
+
+#create-form-container {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================
+   FORM ELEMENTS
+   ============================ */
+
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     font-weight: bold;
     color: var(--text-color);
+    font-size: 0.95rem;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="number"] {
+input[type="text"] {
     width: 100%;
-    padding: 8px;
+    padding: 12px;
     border: 1px solid var(--border-color);
     font-size: 1rem;
+    font-family: 'Cinzel', serif;
+    background-color: #fafafa;
 }
 
-input:focus {
+input[type="text"]:focus {
     outline: none;
     border-width: 2px;
+    background-color: white;
 }
 
-/* Buttons */
-.btn {
-    background-color: var(--button-color);
+/* ============================
+   BUTTONS
+   ============================ */
+
+.btn-create {
+    background-color: var(--primary-red);
     color: var(--button-text);
     border: none;
-    padding: 10px 20px;
-    font-size: 1rem;
+    padding: 15px 30px;
+    font-size: 1.1rem;
     cursor: pointer;
-    width: 100%;
-    margin-top: 10px;
+    font-family: 'Cinzel', serif;
+    font-weight: bold;
+    transition: background-color 0.2s;
 }
 
-.btn:hover {
-    opacity: 0.9;
+.btn-create:hover {
+    background-color: #b8122e;
 }
 
-/* Output area */
-.output-scroll {
-    background-color: var(--box-background);
-    border: 2px solid var(--border-color);
-    padding: 15px;
-    margin: 15px 0;
-    font-family: monospace;
-    font-size: 0.9rem;
-    min-height: 100px;
-    white-space: pre-wrap;
+.btn-cancel {
+    background-color: var(--cancel-color);
+    color: var(--text-color);
+    border: 1px solid #ccc;
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    transition: background-color 0.2s;
 }
 
-/* Simple divider */
-.divider {
-    height: 2px;
-    background-color: var(--border-color);
-    margin: 20px 0;
+.btn-cancel:hover {
+    background-color: #e0e0e0;
 }
 
-/* Mobile responsive */
+.form-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+/* ============================
+   RESPONSIVE DESIGN
+   ============================ */
+
 @media (max-width: 768px) {
-    .scroll-container {
-        margin: 80px 10px 20px 10px;
+    body {
         padding: 10px;
     }
     
-    .form-section {
+    .main-container {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .left-half,
+    .right-half {
         padding: 15px;
     }
     
-    .site-title {
-        font-size: 1.2rem;
+    h2 {
+        font-size: 1.1rem;
+        padding: 12px;
+        margin: -15px -15px 15px -15px;
+    }
+    
+    .form-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .btn-create,
+    .btn-cancel {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 1rem;
     }
 } 

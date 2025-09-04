@@ -2,19 +2,7 @@
 
 ## Build Squads and Battle your Rivals
 
-This is a simple wargame where you can build squads of units and battle other players.
-
-### Geography System
-Each user has the ability to fight the 2 users ranked above them and the 2 users ranked below them at will.  This represents the location of rival armies and their distance from each other.  Since the enemies ranked 2 away are geographically farther, attacking an enemy ranked 2 away from you includes a -1 morale boost.
-
-.
--
-0
--
-.
-
-### Roving System
-Each user has an outpost they occupy and defend.  Users can spend loot to improve their outpost's defensive capabilites.  Outposts captured can be moved into as the user's new home outpost.  Outpost upgrades remain with each outpost even if you lose that outpost and someone else gains it.
+This is a simple wargame where you can build squads of units.
 
 ### Combat Loop
 When combat starts, each unit starts at a distance (100) from the enemy units.  Since defending units are always in a specific outpost, they are all the same distance from each other.

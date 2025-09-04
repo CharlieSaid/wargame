@@ -7,82 +7,65 @@
     <link rel="stylesheet" href="frontend/styles.css">
 </head>
 <body>
-    <!-- Top Banner Header -->
-    <header class="top-banner">
-        <div class="banner-left">
-            <h1 class="site-title">Wargame</h1>
-        </div>
-        <div class="banner-right">
-            <span class="user-info">⚔️ Sir Placeholder the Bold</span>
-        </div>
-    </header>
 
-    <div class="scroll-container">
+    <!-- ========================================= -->
+    <!-- SIMPLE 2-COLUMN LAYOUT                  -->
+    <!-- ========================================= -->
+    <div class="main-container">
         
-        <!-- Create Warrior Section -->
-        <section class="form-section">
-            <h2>🏰 Recruit a Warrior</h2>
-            <form id="user-form">
-                <div class="form-group">
-                    <label for="username">Warrior Name:</label>
-                    <input type="text" id="username" placeholder="Enter your warrior's name..." required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Herald's Message (Email):</label>
-                    <input type="email" id="email" placeholder="warrior@realm.com" required>
-                </div>
-                <button type="button" id="create-user-btn" class="btn">⚔️ Join the Realm</button>
-            </form>
-        </section>
-
-        <div class="divider"></div>
-
-        <!-- Create Squad Section -->
-        <section class="form-section">
-            <h2>🛡️ Assemble a Squad</h2>
-            <form id="squad-form">
-                <div class="form-group">
-                    <label for="userId">Warrior ID:</label>
-                    <input type="number" id="userId" placeholder="Enter warrior ID..." required>
-                </div>
-                <div class="form-group">
-                    <label for="squadName">Squad Name:</label>
-                    <input type="text" id="squadName" placeholder="Name your mighty squad..." required>
-                </div>
-                <div class="form-group">
-                    <label for="description">Squad Description:</label>
-                    <input type="text" id="description" placeholder="Describe your squad's purpose...">
-                </div>
-                <button type="button" id="create-squad-btn" class="btn">⚔️ Assemble Squad</button>
-            </form>
-        </section>
-
-        <div class="divider"></div>
-
-        <!-- List Squads Section -->
-        <section class="form-section">
-            <h2>📜 View Your Squads</h2>
-            <form id="list-form">
-                <div class="form-group">
-                    <label for="listUserId">Warrior ID:</label>
-                    <input type="number" id="listUserId" placeholder="Enter warrior ID..." required>
-                </div>
-                <button type="button" id="list-squads-btn" class="btn">🔍 View Squads</button>
-            </form>
-        </section>
-
-        <div class="divider"></div>
-
-        <!-- Battle Log Section -->
-        <section>
-            <h2>📜 Battle Log</h2>
-            <div class="output-scroll" id="output">
-                Awaiting your commands, brave warrior...
+        <!-- LEFT HALF: Squad List -->
+        <div class="left-half">
+            <h2>🏰 Squads</h2>
+            <div id="squads-list">
+                <!-- Top 5 squads will be loaded here -->
             </div>
-            <button type="button" id="clear-output-btn" class="btn">🧹 Clear Log</button>
-        </section>
+        </div>
+
+        <!-- RIGHT HALF: Squad Creation -->
+        <div class="right-half">
+            <h2>⚔️ Create</h2>
+            
+            <!-- Initial state: Just the create button -->
+            <div id="create-button-container">
+                <button id="create-squad-btn" class="btn-create" onclick="showCreateForm()">
+                    Create Squad
+                </button>
+            </div>
+            
+            <!-- Creation form (hidden initially) -->
+            <div id="create-form-container" style="display: none;">
+                <div class="form-group">
+                    <label for="squad-name">Squad Name:</label>
+                    <input type="text" id="squad-name" placeholder="Enter squad name...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="squad-commander">Commander (optional):</label>
+                    <input type="text" id="squad-commander" placeholder="Your name or handle...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="squad-description">Description (optional):</label>
+                    <input type="text" id="squad-description" placeholder="Enter description...">
+                </div>
+                
+                <div class="form-buttons">
+                    <button id="cancel-btn" class="btn-cancel" onclick="hideCreateForm()">
+                        Cancel
+                    </button>
+                    <button id="create-btn" class="btn-create" onclick="createSquad()">
+                        Create
+                    </button>
+                </div>
+            </div>
+        </div>
+        
     </div>
 
+    <!-- ========================================= -->
+    <!-- JAVASCRIPT                              -->
+    <!-- ========================================= -->
     <script src="frontend/script.js"></script>
+    
 </body>
 </html>

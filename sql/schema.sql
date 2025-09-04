@@ -45,21 +45,12 @@ CREATE TABLE weapons (
     description VARCHAR(1000)
 );
 
--- Users table: Stores information about users who own squads
-CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
-    username VARCHAR(50) NOT NULL UNIQUE,
-    email VARCHAR(100) UNIQUE,
-    password_hash VARCHAR(100) NOT NULL,
-    colors JSONB,
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-);
-
--- Squads table: Each squad belongs to one user
+-- Squads table: Anyone can create and view squads
+-- commander is the name of the person who created the squad
 CREATE TABLE squads (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     name VARCHAR(100) NOT NULL,
+    commander VARCHAR(100),
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     description VARCHAR(1000)
 );
@@ -79,7 +70,6 @@ CREATE TABLE units (
 );
 
 -- PostgreSQL indexes for better query performance
-CREATE INDEX idx_squads_user_id ON squads(user_id);
 CREATE INDEX idx_units_squad_id ON units(squad_id);
 CREATE INDEX idx_units_race ON units(race);
 CREATE INDEX idx_units_class ON units(class);

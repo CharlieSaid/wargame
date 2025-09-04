@@ -31,3 +31,11 @@ INSERT INTO weapons (name, damage, damage_type, range, description) VALUES
     ('Infantry Sword', 40, 'mundane', 1, 'A short, one-handed and double-edged blade.  Ideal for fighting in close quarters.'),
     ('Bow', 50, 'mundane', 60, 'Long-range projectile weapon.'),
     ('Longbow', 60, 'mundane', 100, 'A larger, more powerful bow.');
+
+INSERT INTO squads (name, commander, description) VALUES
+    ('Lion Knights', 'default', 'A squad of Lion Knights'),
+    ('Dragon Knights', 'default', 'A squad of Dragon Knights');
+
+INSERT INTO units (squad_id, name, race, class, level, armor, weapon, description) VALUES
+    (1, 'George the Lion', 'Man', 'Basic', 1, 'None', 'Infantry Sword', 'George serves the Lion Knights with honor.'),
+    (2, 'Halvar the Dragon', 'Man', 'Basic', 1, 'Leather Armor', 'Infantry Sword', 'Halvar is a Dragon Knights reknowned for his courage and daring.');

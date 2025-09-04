@@ -5,17 +5,17 @@
 \echo 'Starting database rebuild...'
 
 -- Step 1: Clean up existing tables
-\i cleanup.sql
+\i sql/cleanup.sql
 
 \echo 'Cleanup complete. Creating new schema...'
 
 -- Step 2: Create fresh schema
-\i schema.sql
+\i sql/schema.sql
 
 \echo 'Schema created. Inserting sample data...'
 
 -- Step 3: Insert sample data
-\i data.sql
+\i sql/data.sql
 
 \echo 'Database rebuild complete!'
 \echo 'You can now query your tables:'
