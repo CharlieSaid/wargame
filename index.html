@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚔️ Medieval Wargame ⚔️</title>
+    <title>Medieval Wargame</title>
     <link rel="stylesheet" href="frontend/styles.css">
 </head>
 <body>
@@ -15,7 +15,7 @@
         
         <!-- LEFT HALF: Squad List -->
         <div class="left-half">
-            <h2>🏰 Squads</h2>
+            <h2>Squads</h2>
             <div id="squads-list">
                 <!-- Top 5 squads will be loaded here -->
             </div>
@@ -23,7 +23,7 @@
 
         <!-- RIGHT HALF: Squad Creation -->
         <div class="right-half">
-            <h2>⚔️ Create</h2>
+            <h2>Create</h2>
             
             <!-- Initial state: Just the create button -->
             <div id="create-button-container">
@@ -34,21 +34,37 @@
             
             <!-- Creation form (hidden initially) -->
             <div id="create-form-container" style="display: none;">
-                <div class="form-group">
-                    <label for="squad-name">Squad Name:</label>
-                    <input type="text" id="squad-name" placeholder="Enter squad name...">
+                <!-- Squad Information -->
+                <div class="form-section">
+                    <h3>Squad Information</h3>
+                    <div class="form-group">
+                        <label for="squad-name">Squad Name:</label>
+                        <input type="text" id="squad-name" placeholder="Enter squad name...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="squad-commander">Commander (optional):</label>
+                        <input type="text" id="squad-commander" placeholder="Your name or handle...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="squad-description">Description (optional):</label>
+                        <input type="text" id="squad-description" placeholder="Enter description...">
+                    </div>
+                </div>
+
+                <!-- Units Section -->
+                <div class="form-section">
+                    <h3>Units</h3>
+                    <div id="units-container">
+                        <!-- Units will be added here -->
+                    </div>
+                    <button type="button" class="btn-add-unit" onclick="addUnitForm()">
+                        + Add Unit
+                    </button>
                 </div>
                 
-                <div class="form-group">
-                    <label for="squad-commander">Commander (optional):</label>
-                    <input type="text" id="squad-commander" placeholder="Your name or handle...">
-                </div>
-                
-                <div class="form-group">
-                    <label for="squad-description">Description (optional):</label>
-                    <input type="text" id="squad-description" placeholder="Enter description...">
-                </div>
-                
+                <!-- Form Buttons -->
                 <div class="form-buttons">
                     <button id="cancel-btn" class="btn-cancel" onclick="hideCreateForm()">
                         Cancel

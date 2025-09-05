@@ -2,7 +2,7 @@
  * WARGAME FRONTEND - MINIMALIST DESIGN
  * 
  * Simple 2-column interface: Squad list on left, creation form on right.
- * Focus on squad creation only - unit management removed for simplicity.
+ * Focus on squad creation with integrated unit creation.
  */
 
 // ============================
@@ -14,14 +14,62 @@ class WargameApp {
         // Configuration
         this.apiUrl = "https://wargame-mbpq.onrender.com/api";
         
+        // State tracking
+        this.gameData = {}; // Cache for races, classes, armors, weapons
+        this.unitCounter = 0; // For unique unit IDs in the form
+        
         // Start the app
         this.init();
     }
 
     async init() {
-        console.log("🏰 Starting Wargame...");
+        console.log("Starting Wargame...");
+        await this.loadGameData();
         await this.loadSquads();
-        console.log("⚔️ Wargame ready!");
+        console.log("Wargame ready!");
+    }
+
+    // ============================
+    // GAME DATA MANAGEMENT
+    // ============================
+    
+    async loadGameData() {
+        /**
+         * Load dropdown options for unit creation (races, classes, armors, weapons)
+         * Falls back to hardcoded data if API endpoints aren't available
+         */
+        try {
+            // Try to load from API
+            const [races, classes, armors, weapons] = await Promise.all([
+                fetch(`${this.apiUrl}/races`).then(r => r.json()),
+                fetch(`${this.apiUrl}/classes`).then(r => r.json()),
+                fetch(`${this.apiUrl}/armors`).then(r => r.json()),
+                fetch(`${this.apiUrl}/weapons`).then(r => r.json())
+            ]);
+            
+            this.gameData = { races, classes, armors, weapons };
+            console.log("Game data loaded from API");
+            
+        } catch (error) {
+            // Use fallback data if API isn't available
+            console.log("Using fallback game data");
+            this.gameData = {
+                races: [
+                    { name: 'Man' }, { name: 'Elf' }, { name: 'Dwarf' }, { name: 'Goblin' }
+                ],
+                classes: [
+                    { name: 'Basic' }, { name: 'Berzerker' }, { name: 'Rogue' }, 
+                    { name: 'Battlemage' }, { name: 'Auramancer' }, { name: 'Healing Mage' }, 
+                    { name: 'Commander' }, { name: 'Hero' }
+                ],
+                armors: [
+                    { name: 'None' }, { name: 'Light' }, { name: 'Medium' }, { name: 'Heavy' }
+                ],
+                weapons: [
+                    { name: 'None' }, { name: 'Infantry Sword' }, { name: 'Bow' }, { name: 'Longbow' }
+                ]
+            };
+        }
     }
 
     // ============================
@@ -39,13 +87,13 @@ class WargameApp {
                 // Take only the first 5 squads
                 const topSquads = allSquads.slice(0, 5);
                 this.displaySquads(topSquads);
-                console.log(`🏰 Loaded ${topSquads.length} squads (showing top 5)`);
+                console.log(`Loaded ${topSquads.length} squads (showing top 5)`);
             } else {
-                console.error("❌ Failed to load squads");
+                console.error("Failed to load squads");
                 this.displaySquads([]);
             }
         } catch (error) {
-            console.error("❌ Error loading squads:", error);
+            console.error("Error loading squads:", error);
             this.displaySquads([]);
         }
     }
@@ -93,9 +141,12 @@ class WargameApp {
         document.getElementById('create-button-container').style.display = 'none';
         document.getElementById('create-form-container').style.display = 'block';
         
+        // Reset unit counter
+        this.unitCounter = 0;
+        
         // Focus on the name field
         document.getElementById('squad-name').focus();
-        console.log("📝 Showing create form");
+        console.log("Showing create form");
     }
 
     hideCreateForm() {
@@ -110,50 +161,194 @@ class WargameApp {
         document.getElementById('squad-commander').value = '';
         document.getElementById('squad-description').value = '';
         
-        console.log("❌ Hiding create form");
+        // Clear units
+        document.getElementById('units-container').innerHTML = '';
+        this.unitCounter = 0;
+        
+        console.log("Hiding create form");
     }
+
+    // ============================
+    // UNIT FORM MANAGEMENT
+    // ============================
+
+    addUnitForm() {
+        /**
+         * Add a new unit form to the units container
+         */
+        this.unitCounter++;
+        const unitId = `unit-${this.unitCounter}`;
+        
+        const unitsContainer = document.getElementById('units-container');
+        
+        const unitForm = document.createElement('div');
+        unitForm.className = 'unit-form';
+        unitForm.id = unitId;
+        
+        unitForm.innerHTML = `
+            <div class="unit-form-header">
+                <span class="unit-form-title">Unit ${this.unitCounter}</span>
+                <button type="button" class="remove-unit-btn" onclick="removeUnitForm('${unitId}')">×</button>
+            </div>
+            
+            <div class="unit-name-field">
+                <label for="${unitId}-name">Unit Name:</label>
+                <input type="text" id="${unitId}-name" placeholder="Enter unit name...">
+            </div>
+            
+            <div class="unit-attributes-grid">
+                <div class="attribute-group">
+                    <label for="${unitId}-race">Race:</label>
+                    <select id="${unitId}-race">
+                        <option value="">Select Race</option>
+                        ${this.generateOptions(this.gameData.races)}
+                    </select>
+                </div>
+                
+                <div class="attribute-group">
+                    <label for="${unitId}-class">Class:</label>
+                    <select id="${unitId}-class">
+                        <option value="">Select Class</option>
+                        ${this.generateOptions(this.gameData.classes)}
+                    </select>
+                </div>
+                
+                <div class="attribute-group">
+                    <label for="${unitId}-armor">Armor:</label>
+                    <select id="${unitId}-armor">
+                        <option value="">Select Armor</option>
+                        ${this.generateOptions(this.gameData.armors)}
+                    </select>
+                </div>
+                
+                <div class="attribute-group">
+                    <label for="${unitId}-weapon">Weapon:</label>
+                    <select id="${unitId}-weapon">
+                        <option value="">Select Weapon</option>
+                        ${this.generateOptions(this.gameData.weapons)}
+                    </select>
+                </div>
+            </div>
+        `;
+        
+        unitsContainer.appendChild(unitForm);
+        console.log(`Added unit form ${this.unitCounter}`);
+    }
+
+    generateOptions(items) {
+        /**
+         * Generate HTML option elements for dropdowns
+         */
+        return items.map(item => 
+            `<option value="${item.name}">${item.name}</option>`
+        ).join('');
+    }
+
+    // ============================
+    // SQUAD + UNITS CREATION
+    // ============================
 
     async createSquad() {
         /**
-         * Create a new squad using the form data
+         * Create a new squad with its units
          */
-        const name = document.getElementById('squad-name').value.trim();
+        // Get squad data
+        const squadName = document.getElementById('squad-name').value.trim();
         const commander = document.getElementById('squad-commander').value.trim();
         const description = document.getElementById('squad-description').value.trim();
 
         // Validate required fields
-        if (!name) {
+        if (!squadName) {
             alert('Squad name is required!');
             document.getElementById('squad-name').focus();
             return;
         }
 
+        // Get units data
+        const units = this.collectUnitsData();
+
         try {
-            const response = await fetch(`${this.apiUrl}/squads`, {
+            // First, create the squad
+            const squadResponse = await fetch(`${this.apiUrl}/squads`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    name: name,
+                    name: squadName,
                     commander: commander || '',
                     description: description || ''
                 })
             });
 
-            if (response.ok) {
-                console.log(`✅ Squad created: ${name} by ${commander || 'Anonymous'}`);
-                
-                // Hide form and refresh the squad list
-                this.hideCreateForm();
-                await this.loadSquads();
-                
-            } else {
-                const error = await response.json();
+            if (!squadResponse.ok) {
+                const error = await squadResponse.json();
                 alert(`Failed to create squad: ${error.error || 'Unknown error'}`);
+                return;
             }
+
+            const createdSquad = await squadResponse.json();
+            console.log(`Squad created: ${squadName} (ID: ${createdSquad.id})`);
+
+            // Then, create each unit for the squad
+            for (const unit of units) {
+                try {
+                    const unitResponse = await fetch(`${this.apiUrl}/units`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            squad_id: createdSquad.id,
+                            name: unit.name,
+                            race: unit.race || null,
+                            class: unit.class || 'Basic',
+                            level: 1,
+                            armor: unit.armor || null,
+                            weapon: unit.weapon || null
+                        })
+                    });
+
+                    if (unitResponse.ok) {
+                        console.log(`Unit created: ${unit.name}`);
+                    } else {
+                        console.error(`Failed to create unit: ${unit.name}`);
+                    }
+                } catch (error) {
+                    console.error(`Error creating unit ${unit.name}:`, error);
+                }
+            }
+
+            // Success - hide form and refresh list
+            this.hideCreateForm();
+            await this.loadSquads();
+            
         } catch (error) {
-            console.error('❌ Error creating squad:', error);
+            console.error('Error creating squad:', error);
             alert('Error creating squad. Please try again.');
         }
+    }
+
+    collectUnitsData() {
+        /**
+         * Collect data from all unit forms
+         */
+        const units = [];
+        const unitForms = document.querySelectorAll('.unit-form');
+        
+        unitForms.forEach(form => {
+            const unitId = form.id;
+            const name = document.getElementById(`${unitId}-name`).value.trim();
+            
+            // Only include units with names
+            if (name) {
+                units.push({
+                    name: name,
+                    race: document.getElementById(`${unitId}-race`).value,
+                    class: document.getElementById(`${unitId}-class`).value,
+                    armor: document.getElementById(`${unitId}-armor`).value,
+                    weapon: document.getElementById(`${unitId}-weapon`).value
+                });
+            }
+        });
+        
+        return units;
     }
 }
 
@@ -174,6 +369,18 @@ function createSquad() {
     app.createSquad();
 }
 
+function addUnitForm() {
+    app.addUnitForm();
+}
+
+function removeUnitForm(unitId) {
+    const unitForm = document.getElementById(unitId);
+    if (unitForm) {
+        unitForm.remove();
+        console.log(`Removed unit form ${unitId}`);
+    }
+}
+
 // ============================
 // APPLICATION INITIALIZATION
 // ============================
@@ -184,13 +391,10 @@ document.addEventListener('DOMContentLoaded', function() {
     app = new WargameApp();
     
     // Add Enter key support for form submission
-    const formInputs = document.querySelectorAll('#create-form-container input[type="text"]');
-    formInputs.forEach(input => {
-        input.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                createSquad();
-            }
-        });
+    document.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && document.getElementById('create-form-container').style.display !== 'none') {
+            e.preventDefault();
+            createSquad();
+        }
     });
 }); 

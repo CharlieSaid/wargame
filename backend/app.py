@@ -89,12 +89,12 @@ def handle_error(error):
         return jsonify({"error": "An unexpected error occurred"}), 500
 
 # ============================
-# SQUAD ENDPOINTS
+# API ENDPOINTS
 # ============================
 
+# Create new squad
 @app.route("/api/squads", methods=["POST"])
 def create_squad():
-    """Create a new squad (no user required)"""
     data = request.get_json()
     
     # Validate input - only name is required
@@ -103,7 +103,7 @@ def create_squad():
         return jsonify({"error": validation_error}), 400
     
     name = data.get("name")
-    commander = data.get("commander", "")  # Optional commander name
+    commander = data.get("commander", "") 
     description = data.get("description", "")
     
     try:
@@ -113,9 +113,9 @@ def create_squad():
     except Exception as e:
         return handle_error(e)
 
+# Get all squads
 @app.route("/api/squads", methods=["GET"])
 def get_all_squads():
-    """Get all squads (accessible to everyone)"""
     try:
         query = "SELECT id, name, commander, description, created_at FROM squads ORDER BY created_at DESC"
         squads = execute_query(query, fetch_all=True)
@@ -123,9 +123,9 @@ def get_all_squads():
     except Exception as e:
         return handle_error(e)
 
+# Get a specific squad
 @app.route("/api/squads/<int:squad_id>", methods=["GET"])
 def get_squad(squad_id):
-    """Get details for a specific squad"""
     try:
         query = "SELECT id, name, commander, description, created_at FROM squads WHERE id = %s"
         squad = execute_query(query, (squad_id,), fetch_one=True)
@@ -137,9 +137,9 @@ def get_squad(squad_id):
     except Exception as e:
         return handle_error(e)
 
+# Delete a squad by id (cascade deletes all units in that squad)
 @app.route("/api/squads/<int:squad_id>", methods=["DELETE"])
 def delete_squad(squad_id):
-    """Delete a squad (this will also delete all units in the squad due to cascade)"""
     try:
         query = "DELETE FROM squads WHERE id = %s"
         rows_affected = execute_query(query, (squad_id,))
@@ -151,13 +151,10 @@ def delete_squad(squad_id):
     except Exception as e:
         return handle_error(e)
 
-# ============================
-# UNIT ENDPOINTS
-# ============================
 
+# Get all units in a specific squad
 @app.route("/api/squads/<int:squad_id>/units", methods=["GET"])
 def get_squad_units(squad_id):
-    """Get all units in a specific squad"""
     try:
         query = "SELECT id, name, race, class, level, armor, weapon FROM units WHERE squad_id = %s ORDER BY name"
         units = execute_query(query, (squad_id,), fetch_all=True)
@@ -165,9 +162,9 @@ def get_squad_units(squad_id):
     except Exception as e:
         return handle_error(e)
 
+# Create a new unit in a squad
 @app.route("/api/units", methods=["POST"])
 def create_unit():
-    """Create a new unit in a squad"""
     data = request.get_json()
     
     # Validate input
@@ -192,39 +189,40 @@ def create_unit():
     except Exception as e:
         return handle_error(e)
 
-@app.route("/api/units/<int:unit_id>", methods=["PUT"])
-def update_unit(unit_id):
-    """Update attributes of an existing unit"""
-    data = request.get_json()
+# # Update an existing unit
+# @app.route("/api/units/<int:unit_id>", methods=["PUT"])
+# def update_unit(unit_id):
+#     """Update attributes of an existing unit"""
+#     data = request.get_json()
     
-    if not data:
-        return jsonify({"error": "Request body is required"}), 400
+#     if not data:
+#         return jsonify({"error": "Request body is required"}), 400
     
-    # Build dynamic update query based on provided fields
-    allowed_fields = ["name", "race", "class", "level", "armor", "weapon"]
-    updates = []
-    values = []
+#     # Build dynamic update query based on provided fields
+#     allowed_fields = ["name", "race", "class", "level", "armor", "weapon"]
+#     updates = []
+#     values = []
     
-    for field in allowed_fields:
-        if field in data:
-            updates.append(f"{field} = %s")
-            values.append(data[field])
+#     for field in allowed_fields:
+#         if field in data:
+#             updates.append(f"{field} = %s")
+#             values.append(data[field])
     
-    if not updates:
-        return jsonify({"error": "No valid fields to update"}), 400
+#     if not updates:
+#         return jsonify({"error": "No valid fields to update"}), 400
     
-    values.append(unit_id)  # Add unit_id for WHERE clause
+#     values.append(unit_id)  # Add unit_id for WHERE clause
     
-    try:
-        query = f"UPDATE units SET {', '.join(updates)} WHERE id = %s RETURNING id, name, race, class, level, armor, weapon"
-        unit = execute_query(query, values, fetch_one=True)
+#     try:
+#         query = f"UPDATE units SET {', '.join(updates)} WHERE id = %s RETURNING id, name, race, class, level, armor, weapon"
+#         unit = execute_query(query, values, fetch_one=True)
         
-        if unit:
-            return jsonify(unit), 200
-        else:
-            return jsonify({"error": "Unit not found"}), 404
-    except Exception as e:
-        return handle_error(e)
+#         if unit:
+#             return jsonify(unit), 200
+#         else:
+#             return jsonify({"error": "Unit not found"}), 404
+#     except Exception as e:
+#         return handle_error(e)
 
 # ============================
 # GAME DATA ENDPOINTS
