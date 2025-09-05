@@ -4,7 +4,6 @@ A simple Flask API for managing squads and units in a medieval wargame.
 No user system - anyone can create and view squads.
 """
 
-import hashlib
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import psycopg2

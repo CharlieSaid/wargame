@@ -4,9 +4,7 @@
 
 This is a simple wargame where you can build squads of units.
 
-### Combat Loop
-When combat starts, each unit starts at a distance (100) from the enemy units.  Since defending units are always in a specific outpost, they are all the same distance from each other.
-
+### Combat Ideas
 Each "Turn", every unit moves its speed to move into range.  For units with melee weapons, this means moving closer, while units with ranged weapons will likely move farther away if they can.
 
 After moving, if the unit is within range to attack, they do.  If they are not, they get to move a second time within the Turn.
