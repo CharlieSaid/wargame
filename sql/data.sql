@@ -6,6 +6,8 @@ INSERT INTO races (name, skill, base_HP, base_speed, base_agility, base_damage, 
 
 INSERT INTO classes (name, skill) VALUES
     ('Basic', NULL),
+    ('Knight', 'Vows of Honor'),
+    ('Marksman', 'Keen Aim'),
     ('Berzerker', 'Berzerk'),
     ('Rogue', 'Stealth'),
     ('Battlemage', 'Magic Attacks'),
@@ -15,27 +17,65 @@ INSERT INTO classes (name, skill) VALUES
     ('Hero', 'Heroic Feat');
 
 INSERT INTO armors (name, defense_bonus, weight, description) VALUES
-    ('None', 0, 0, 'No armor'),
-    ('Leather Armor', 2, 5, 'A light, flexible armor made from treated animal hide.'),
-    ('Gambison', 5, 15, 'A thick, padded armor made from animal hide and wool.'),
-    ('Studded Leather', 7, 10, 'A leather armor with metal studs for added protection.'),
-    ('Chainmail', 10, 20, 'A series of interlocking metal rings that provide good protection and mobility.'),
-    ('Dwarf Mail', 12, 25, 'A heavier version of chainmail, made from thick, square metal rings.'),
-    ('Elf Weave', 15, 30, 'A lightweight mail armor made from interwoven strips of metal.'),
-    ('Bone Armor', 18, 35, 'A heavy armor made from a patchwork of bones.'),
-    ('Plate Armor', 20, 40, 'The ultimate in protection, plate armor is made from interlocking metal plates.'),
-    ('Heavy Plate Mail', 25, 45, 'The heaviest of all armor, plate mail is made from interlocking metal plates and chainmail.');
+    ('Literally Nothing', 0, 0, 'No armor'),
+    ('Ornamental Robes', 1, 0, 'Look fancy, but offer about as much protection as you would expect.'),
+    ('Enchanted Wizard Robes', 10, 0, 'Robes that have been enchanted to provide some protection.'),
+    ('Leather Armor', 2, 1, 'A light, flexible armor made from treated animal hide.'),
+    ('Gambison', 5, 1, 'A thick, padded armor made from animal hide and wool.'),
+    ('Studded Leather', 7, 2, 'A leather armor with metal studs for added protection.'),
+    ('Chainmail', 10, 3, 'A series of interlocking metal rings that provide good protection and mobility.'),
+    ('Dwarf Mail', 12, 4, 'A heavier version of chainmail, made from thick, square metal rings.'),
+    ('Elf Weave', 15, 2, 'A lightweight mail armor made from interwoven strips of metal.'),
+    ('Bone Armor', 18, 3, 'A heavy armor made from a patchwork of bones.'),
+    ('Plate Armor', 20, 4, 'A strong protection, plate armor is made from interlocking metal plates.'),
+    ('Heavy Plate Mail', 25, 5, 'The heaviest of all armor, plate mail is made from interlocking metal plates and chainmail.');
 
 INSERT INTO weapons (name, damage, damage_type, range, description) VALUES
     ('None', 10, 'mundane', 0, 'No weapon equipped, he is fighting with his fists.'),
     ('Infantry Sword', 40, 'mundane', 1, 'A short, one-handed and double-edged blade.  Ideal for fighting in close quarters.'),
-    ('Bow', 50, 'mundane', 60, 'Long-range projectile weapon.'),
-    ('Longbow', 60, 'mundane', 100, 'A larger, more powerful bow.');
+    ('Greatsword', 50, 'mundane', 1, 'A large, heavy sword.'),
+    ('Longsword', 45, 'mundane', 1, 'A long, double-edged blade.'),
+    ('Battleaxe', 45, 'mundane', 1, 'A heavy axe with a long handle.'),
+    ('Dwarven Battleaxe', 50, 'mundane', 1, 'A heavy axe with a long handle.'),
+    ('Dwarven Greatsword', 60, 'mundane', 1, 'A strong, heavy sword forged by dwarves.'),
+    ('Elf Blade', 40, 'mundane', 1, 'A sleek, one-edged blade ideal for slashing.'),
+    ('Goblin Spear', 30, 'mundane', 1, 'A spear made of wood and bone, poorly made but effective.'),
+    ('Goblin Dagger', 20, 'mundane', 1, 'A small, sharp dagger, mishapen but deadly.'),
+    ('Bone Club', 30, 'mundane', 1, 'A club made of bone, powerful but heavy.'),
+    ('Bow', 50, 'mundane', 80, 'Long-range projectile weapon.'),
+    ('Longbow', 60, 'mundane', 100, 'A larger, more powerful bow.'),
+    ('Crossbow', 80, 'mundane', 60, 'A ranged weapon that fires bolts.'),
+    ('Dwarven Crossbow', 100, 'mundane', 60, 'A ranged weapon that fires bolts.'),
+    ('Elf Bow', 60, 'mundane', 110, 'The ultimate ranged weapon, made by elves.');
 
 INSERT INTO squads (name, commander, description) VALUES
     ('Lion Knights', 'default', 'A squad of Lion Knights'),
-    ('Dragon Knights', 'default', 'A squad of Dragon Knights');
+    ('Dwarves of Underhall', 'default', 'The powerful and wealthy kingdom of Dwarves.'),
+    ('Horde of the Western Wastes', 'default', 'A nomadic tribe of goblins, who roam the deserts and wastelands.'),
+    ('Goldenleaf Elves', 'default', 'A kingdom of elves who live in the Western Woods, known for their combination of magic, horticulture, and mining.');
 
 INSERT INTO units (squad_id, name, race, class, level, armor, weapon, description) VALUES
-    (1, 'George the Lion', 'Man', 'Basic', 1, 'None', 'Infantry Sword', 'George serves the Lion Knights with honor.'),
-    (2, 'Halvar the Dragon', 'Man', 'Basic', 1, 'Leather Armor', 'Infantry Sword', 'Halvar is a Dragon Knights reknowned for his courage and daring.');
+    (1, 'George', 'Man', 'Basic', 1, 'Gambison', 'Infantry Sword', 'An infantry soldier of the Lion Knights.'),
+    (1, 'Henrik', 'Man', 'Basic', 1, 'Gambison', 'Infantry Sword', 'An infantry soldier of the Lion Knights.'),
+    -- (1, 'Nodwick', 'Man', 'Marksman', 1, 'Leather Armor', 'Bow', 'An archer of the Lion Knights.'),
+    -- (1, 'Rolf', 'Man', 'Marksman', 1, 'Leather Armor', 'Bow', 'An archer of the Lion Knights.'),
+    -- (1, 'Melvedar', 'Man', 'Battlemage', 1, 'Enchanted Wizard Robes', 'None', 'A battlemage of the Lion Knights.'),
+    (1, 'Will', 'Man', 'Knight', 1, 'Plate Armor', 'Infantry Sword', 'A knight of the Lion Knights.'),
+    (2, 'Durrennal', 'Dwarf', 'Basic', 1, 'Dwarf Mail', 'Dwarven Greatsword', 'A dwarf soldier.'),
+    (2, 'Goreggel', 'Dwarf', 'Basic', 1, 'Dwarf Mail', 'Dwarven Battleaxe', 'A dwarf soldier.'),
+    -- (2, 'Nurhallen', 'Dwarf', 'Marksman', 1, 'Dwarf Mail', 'Dwarven Crossbow', 'A dwarf crossbowman.'),
+    -- (2, 'Ulann', 'Dwarf', 'Marksman', 1, 'Dwarf Mail', 'Dwarven Crossbow', 'A dwarf crossbowman.'),
+    -- (2, 'Meldeveer', 'Dwarf', 'Knight', 1, 'Dwarf Mail', 'Dwarven Greatsword', 'A dwarf knight.'),
+    (2, 'Ahlarromen', 'Dwarf', 'Berzerker', 1, 'Literally Nothing', 'Bone Club', 'A dwarf berzerker.'),
+    -- (3, 'Gash', 'Goblin', 'Basic', 1, 'Literally Nothing', 'Goblin Spear', 'A goblin soldier.'),
+    -- (3, 'Nug', 'Goblin', 'Basic', 1, 'Literally Nothing', 'Goblin Spear', 'A goblin soldier.'),
+    (3, 'Haj', 'Goblin', 'Basic', 1, 'Literally Nothing', 'Goblin Spear', 'A goblin soldier.'),
+    (3, 'Nek', 'Goblin', 'Basic', 1, 'Literally Nothing', 'Goblin Spear', 'A goblin soldier.'),
+    (3, 'Org', 'Goblin', 'Rogue', 1, 'Leather Armor', 'Goblin Dagger', 'A goblin assasin.'),
+    -- (3, 'Zigik', 'Goblin', 'Berzerker', 1, 'Bone Armor', 'Bone Club', 'A goblin berzerker.'),
+    (4, 'Kelawill', 'Elf', 'Basic', 1, 'Elf Weave', 'Elf Blade', 'An elf soldier.'),
+    (4, 'Forlandin', 'Elf', 'Basic', 1, 'Elf Weave', 'Elf Blade', 'An elf soldier.'),
+    -- (4, 'Helabir', 'Elf', 'Basic', 1, 'Elf Weave', 'Elf Bow', 'An elf archer.'),
+    -- (4, 'Surfalond', 'Elf', 'Basic', 1, 'Elf Weave', 'Elf Bow', 'An elf archer.'),
+    -- (4, 'Grasbell', 'Elf', 'Battlemage', 1, 'Plate Armor', 'Longsword', 'An elf battlemage.'),
+    (4, 'Urthalen', 'Elf', 'Auramancer', 1, 'Enchanted Wizard Robes', 'None', 'An elf auramancer.');

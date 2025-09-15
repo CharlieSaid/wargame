@@ -187,13 +187,8 @@ class WargameApp {
         
         unitForm.innerHTML = `
             <div class="unit-form-header">
-                <span class="unit-form-title">Unit ${this.unitCounter}</span>
+                <input type="text" class="unit-name-input" id="${unitId}-name" placeholder="Enter unit name..." autocomplete="off">
                 <button type="button" class="remove-unit-btn" onclick="removeUnitForm('${unitId}')">×</button>
-            </div>
-            
-            <div class="unit-name-field">
-                <label for="${unitId}-name">Unit Name:</label>
-                <input type="text" id="${unitId}-name" placeholder="Enter unit name...">
             </div>
             
             <div class="unit-attributes-grid">
@@ -232,6 +227,19 @@ class WargameApp {
         `;
         
         unitsContainer.appendChild(unitForm);
+        
+        // Add event listeners for the name input
+        const nameInput = document.getElementById(`${unitId}-name`);
+        nameInput.addEventListener('blur', () => this.handleNameBlur(unitId));
+        nameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                nameInput.blur(); // Trigger the blur event
+            }
+        });
+        
+        // Focus on the name input
+        nameInput.focus();
+        
         console.log(`Added unit form ${this.unitCounter}`);
     }
 
@@ -242,6 +250,46 @@ class WargameApp {
         return items.map(item => 
             `<option value="${item.name}">${item.name}</option>`
         ).join('');
+    }
+
+    handleNameBlur(unitId) {
+        /**
+         * Handle when user clicks out of or presses Enter in the name input
+         */
+        const nameInput = document.getElementById(`${unitId}-name`);
+        const unitName = nameInput.value.trim();
+        
+        if (unitName) {
+            // Convert input to header
+            const header = nameInput.parentElement;
+            nameInput.style.display = 'none';
+            
+            // Create or update the name header
+            let nameHeader = header.querySelector('.unit-name-header');
+            if (!nameHeader) {
+                nameHeader = document.createElement('span');
+                nameHeader.className = 'unit-name-header';
+                nameHeader.addEventListener('click', () => this.editUnitName(unitId));
+                header.insertBefore(nameHeader, nameInput);
+            }
+            nameHeader.textContent = unitName;
+            nameHeader.style.display = 'inline';
+        }
+    }
+
+    editUnitName(unitId) {
+        /**
+         * Allow user to edit unit name by clicking on the header
+         */
+        const header = document.querySelector(`#${unitId} .unit-form-header`);
+        const nameInput = document.getElementById(`${unitId}-name`);
+        const nameHeader = header.querySelector('.unit-name-header');
+        
+        // Hide header and show input
+        nameHeader.style.display = 'none';
+        nameInput.style.display = 'inline';
+        nameInput.focus();
+        nameInput.select(); // Select all text for easy editing
     }
 
     // ============================

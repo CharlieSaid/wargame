@@ -203,10 +203,38 @@ select:focus {
     margin-bottom: 15px;
 }
 
-.unit-form-title {
+.unit-name-input {
     font-weight: bold;
     color: var(--primary-red);
     font-size: 1rem;
+    border: 1px dashed var(--primary-red);
+    padding: 8px 12px;
+    background-color: #fef8e6;
+    outline: none;
+    flex-grow: 1;
+    margin-right: 10px;
+}
+
+.unit-name-input:focus {
+    border: 2px solid var(--primary-red);
+    background-color: white;
+}
+
+.unit-name-header {
+    font-weight: bold;
+    color: var(--primary-red);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 8px 12px;
+    border: 1px solid transparent;
+    transition: background-color 0.2s;
+    flex-grow: 1;
+    margin-right: 10px;
+}
+
+.unit-name-header:hover {
+    background-color: #f0f0f0;
+    border: 1px dashed var(--primary-red);
 }
 
 .remove-unit-btn {
@@ -221,10 +249,7 @@ select:focus {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.unit-name-field {
-    margin-bottom: 15px;
+    flex-shrink: 0;
 }
 
 .unit-attributes-grid {
