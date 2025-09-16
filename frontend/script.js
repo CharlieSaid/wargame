@@ -80,22 +80,38 @@ class WargameApp {
     async loadSquads() {
         /**
          * Load top 5 squads and display them in the left column
+         * Also update the total squad counter
          */
         try {
             const response = await fetch(`${this.apiUrl}/squads`);
             if (response.ok) {
                 const allSquads = await response.json();
+                // Update the total squad counter
+                this.updateSquadCounter(allSquads.length);
                 // Take only the first 5 squads
                 const topSquads = allSquads.slice(0, 5);
                 this.displaySquads(topSquads);
-                console.log(`Loaded ${topSquads.length} squads (showing top 5)`);
+                console.log(`Loaded ${topSquads.length} squads (showing top 5 of ${allSquads.length} total)`);
             } else {
                 console.error("Failed to load squads");
+                this.updateSquadCounter(0);
                 this.displaySquads([]);
             }
         } catch (error) {
             console.error("Error loading squads:", error);
+            this.updateSquadCounter(0);
             this.displaySquads([]);
+        }
+    }
+
+    updateSquadCounter(count) {
+        /**
+         * Update the squad counter display
+         */
+        const counter = document.getElementById('squad-counter');
+        if (counter) {
+            counter.textContent = `Total Squads: ${count}`;
+            console.log(`Updated squad counter to: Total Squads: ${count}`);
         }
     }
 
@@ -550,6 +566,34 @@ function removeUnitForm(unitId) {
 }
 
 // ============================
+// ABOUT POPUP FUNCTIONS
+// ============================
+
+function showAboutPopup() {
+    document.getElementById('about-popup').style.display = 'flex';
+    console.log("Showing about popup");
+}
+
+function hideAboutPopup() {
+    document.getElementById('about-popup').style.display = 'none';
+    console.log("Hiding about popup");
+}
+
+// ============================
+// BATTLE REPORT POPUP FUNCTIONS
+// ============================
+
+function showBattleReportPopup() {
+    document.getElementById('battle-report-popup').style.display = 'flex';
+    console.log("Showing battle report popup");
+}
+
+function hideBattleReportPopup() {
+    document.getElementById('battle-report-popup').style.display = 'none';
+    console.log("Hiding battle report popup");
+}
+
+// ============================
 // APPLICATION INITIALIZATION
 // ============================
 
@@ -563,6 +607,31 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.key === 'Enter' && document.getElementById('create-form-container').style.display !== 'none') {
             e.preventDefault();
             createSquad();
+        }
+    });
+    
+    // Add Escape key support for popup closing
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            if (document.getElementById('about-popup').style.display !== 'none') {
+                hideAboutPopup();
+            }
+            if (document.getElementById('battle-report-popup').style.display !== 'none') {
+                hideBattleReportPopup();
+            }
+        }
+    });
+    
+    // Close popup when clicking outside of it
+    document.addEventListener('click', function(e) {
+        const aboutPopup = document.getElementById('about-popup');
+        const battleReportPopup = document.getElementById('battle-report-popup');
+        
+        if (e.target === aboutPopup) {
+            hideAboutPopup();
+        }
+        if (e.target === battleReportPopup) {
+            hideBattleReportPopup();
         }
     });
 }); 

@@ -15,7 +15,11 @@
         
         <!-- LEFT HALF: Squad List -->
         <div class="left-half">
-            <h2>Squads</h2>
+            <h2 id="left-header">
+                <span id="squad-counter" class="squad-counter">Total Squads: 0</span>
+                <span>Squads</span>
+                <button id="battle-report-btn" class="btn-battle-report" onclick="showBattleReportPopup()">Last Battle Report</button>
+            </h2>
             <div id="squads-list">
                 <!-- Top 5 squads will be loaded here -->
             </div>
@@ -27,6 +31,7 @@
                 <button id="create-squad-btn" class="btn-create-header" onclick="showCreateForm()">
                     Create Squad
                 </button>
+                <button id="about-btn" class="btn-about" onclick="showAboutPopup()">About</button>
             </h2>
             
             <!-- Squad Units Display (hidden initially) -->
@@ -83,8 +88,71 @@
     </div>
 
     <!-- ========================================= -->
-    <!-- JAVASCRIPT                              -->
+    <!-- ABOUT POPUP                              -->
     <!-- ========================================= -->
+    <div id="about-popup" class="popup-overlay" style="display: none;">
+        <div class="popup-content">
+            <div class="popup-header">
+                <h3>About Wargame</h3>
+                <button class="popup-close" onclick="hideAboutPopup()">×</button>
+            </div>
+            <div class="popup-body">
+                <p><strong>Wargame</strong> is a combat game where you can create a squad of soldiers and pit them against other squads.</p>
+                
+                <h4>Features:</h4>
+                <ul>
+                    <li>Create a custom squad of different soldiers - and put your name on it!</li>
+                    <li>Add units with different races, classes, armor, and weapons.</li>
+                    <li>If there are enough squads, they will battle each other on a schedule to find the strongest one.</li>
+                </ul>
+                
+                <h4>How to Play:</h4>
+                <ol>
+                    <li>Click "Create Squad" to design your squad.</li>
+                    <li>Add units to your squad with different attributes like race, class, armor, and weapon.</li>
+                    <li>Click on squads listed on the left to view their units.</li>
+                    <li>If there are enough squads, they will battle each other once every 2 hours.</li>
+                    <li>There is a limit to the total number of squads that can be created, but no limit to the number you can have.  They just have to survive!</li>
+                    <li>Build multiple squads for different strategies.</li>
+                </ol>
+                
+                <p><em>Built by Charles Said with Flask, PostgreSQL, JavaScript, Python, HTML, and CSS.</em></p>
+            </div>
+        </div>
+    </div>
+
+        <!-- ========================================= -->
+        <!-- BATTLE REPORT POPUP                        -->
+        <!-- ========================================= -->
+        <div id="battle-report-popup" class="popup-overlay" style="display: none;">
+            <div class="popup-content">
+                <div class="popup-header">
+                    <h3>Last Battle Report</h3>
+                    <button class="popup-close" onclick="hideBattleReportPopup()">×</button>
+                </div>
+                <div class="popup-body">
+                    <p><strong>Battle Summary:</strong></p>
+                    <p>No recent battles have been recorded. Battles occur automatically every 2 hours when there are enough squads in the system.</p>
+                    
+                    <h4>Battle System:</h4>
+                    <ul>
+                        <li>Battles are automatically scheduled every 2 hours</li>
+                        <li>Requires a minimum number of squads to trigger</li>
+                        <li>Squads compete based on their unit composition and stats</li>
+                        <li>Winners gain experience and ranking</li>
+                    </ul>
+                    
+                    <h4>Next Battle:</h4>
+                    <p><em>Waiting for sufficient squads to be created...</em></p>
+                    
+                    <p><strong>Current Status:</strong> Battle system is active and monitoring for new squads.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================= -->
+        <!-- JAVASCRIPT                              -->
+        <!-- ========================================= -->
     <script src="frontend/script.js"></script>
     
 </body>

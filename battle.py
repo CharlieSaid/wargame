@@ -1,3 +1,4 @@
+import datetime
 import os
 import random
 import psycopg2
@@ -84,7 +85,6 @@ def calculate_health(unit, current_health, damage_being_dealt):
     return remaining_health
 
 def battle(squads):
-    print("Battle script running")
     
     squads_by_id = {squad['id']: squad for squad in squads}
 
@@ -219,8 +219,16 @@ def main():
         # Begin the battle.
         battle_report, winner_squad_id, loser_squad_id = battle(squads)
 
-        for event in battle_report:
-            print(event)
+        # Add the battle report to the reports folder.
+        os.makedirs('reports', exist_ok=True)
+        
+        # Put the battle report in a file, line by line.
+        with open(f'reports/battle_report_{datetime.datetime.now().strftime("%Y%m%d_%H%M%S")}.txt', 'w') as file:
+            for line in battle_report:
+                file.write(line + '\n')
+        
+        print("Battle report saved to reports folder.")
+        
 
         print(f"The winner is {execute_sql('SELECT name FROM squads WHERE id = %s', 'Error getting winner name', fetchone = True, fetchall = False, params = (winner_squad_id,))['name']}!")
         print(f"The loser is {execute_sql('SELECT name FROM squads WHERE id = %s', 'Error getting loser name', fetchone = True, fetchall = False, params = (loser_squad_id,))['name']}!")

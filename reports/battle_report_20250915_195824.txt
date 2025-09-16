@@ -1,0 +1,60 @@
+Lion Knights and Goldenleaf Elves begin to fight!
+Lion Knights has 3 units...
+George - Man Basic (level 1) wearing Gambison and wielding Infantry Sword
+Henrik - Man Basic (level 1) wearing Gambison and wielding Infantry Sword
+Will - Man Knight (level 1) wearing Plate Armor and wielding Infantry Sword
+Goldenleaf Elves has 3 units...
+Kelawill - Elf Basic (level 1) wearing Elf Weave and wielding Elf Blade
+Forlandin - Elf Basic (level 1) wearing Elf Weave and wielding Elf Blade
+Urthalen - Elf Auramancer (level 1) wearing Enchanted Wizard Robes and wielding None
+The battle begins!
+Urthalen of Goldenleaf Elves now attacks George of Lion Knights.
+Urthalen rolls a 4 to attack George.
+George rolls a 13 to defend against Urthalen.
+George of Lion Knights now has 78 health remaining.
+Kelawill of Goldenleaf Elves now attacks George of Lion Knights.
+Kelawill rolls a 9 to attack George.
+George rolls a 11 to defend against Kelawill.
+George of Lion Knights now has 21 health remaining.
+Forlandin of Goldenleaf Elves now attacks Will of Lion Knights.
+Forlandin rolls a 11 to attack Will.
+Will rolls a 5 to defend against Forlandin.
+Will of Lion Knights now has 41 health remaining.
+George of Lion Knights now attacks Urthalen of Goldenleaf Elves.
+George rolls a 1 to attack Urthalen.
+Urthalen rolls a 16 to defend against George.
+Urthalen of Goldenleaf Elves now has 19 health remaining.
+Henrik of Lion Knights now attacks Kelawill of Goldenleaf Elves.
+Henrik rolls a 7 to attack Kelawill.
+Kelawill rolls a 10 to defend against Henrik.
+Kelawill of Goldenleaf Elves now has 13 health remaining.
+Will of Lion Knights now attacks Kelawill of Goldenleaf Elves.
+Will rolls a 15 to attack Kelawill.
+Kelawill rolls a 12 to defend against Will.
+Kelawill of Goldenleaf Elves now has 0 health remaining.
+Kelawill of Goldenleaf Elves has been defeated!
+Urthalen of Goldenleaf Elves now attacks George of Lion Knights.
+Urthalen rolls a 9 to attack George.
+George rolls a 2 to defend against Urthalen.
+George of Lion Knights now has 0 health remaining.
+George of Lion Knights has been defeated!
+Forlandin of Goldenleaf Elves now attacks Will of Lion Knights.
+Forlandin rolls a 14 to attack Will.
+Will rolls a 7 to defend against Forlandin.
+Will of Lion Knights now has 0 health remaining.
+Will of Lion Knights has been defeated!
+George of Lion Knights now attacks Forlandin of Goldenleaf Elves.
+George rolls a 5 to attack Forlandin.
+Forlandin rolls a 3 to defend against George.
+Forlandin of Goldenleaf Elves now has 15 health remaining.
+Henrik of Lion Knights now attacks Urthalen of Goldenleaf Elves.
+Henrik rolls a 10 to attack Urthalen.
+Urthalen rolls a 7 to defend against Henrik.
+Urthalen of Goldenleaf Elves now has 0 health remaining.
+Urthalen of Goldenleaf Elves has been defeated!
+Will of Lion Knights now attacks Forlandin of Goldenleaf Elves.
+Will rolls a 16 to attack Forlandin.
+Forlandin rolls a 10 to defend against Will.
+Forlandin of Goldenleaf Elves now has 0 health remaining.
+Forlandin of Goldenleaf Elves has been defeated!
+The battle is over!

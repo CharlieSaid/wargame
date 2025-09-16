@@ -70,26 +70,96 @@ h2 {
     font-weight: bold;
 }
 
-/* Right header with centered button */
+/* Left header with counter and centered title */
+#left-header {
+    display: flex;
+    justify-content: center; /* Center the main content */
+    align-items: center;
+    position: relative; /* Enable absolute positioning for counter */
+}
+
+.squad-counter {
+    position: absolute; /* Position absolutely within the header */
+    left: 15px; /* Position on the left side */
+    top: 50%; /* Center vertically */
+    transform: translateY(-50%); /* Perfect vertical centering */
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    padding: 4px 8px;
+    font-size: 0.8rem; /* Slightly smaller to fit better */
+    font-family: 'Cinzel', serif;
+    font-weight: bold;
+    border-radius: 4px;
+    min-width: 120px; /* Increased to accommodate "Total Squads: X" */
+    text-align: center;
+    white-space: nowrap; /* Prevent text wrapping */
+}
+
+.btn-battle-report {
+    position: absolute; /* Position absolutely within the header */
+    right: 15px; /* Position on the right side */
+    top: 50%; /* Center vertically */
+    transform: translateY(-50%); /* Perfect vertical centering */
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    padding: 6px 12px;
+    font-size: 0.8rem; /* Smaller font to fit better */
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-weight: bold;
+    transition: background-color 0.2s;
+    border-radius: 4px;
+    white-space: nowrap; /* Prevent text wrapping */
+}
+
+.btn-battle-report:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Right header with centered button and about button */
 #right-header {
     display: flex;
-    justify-content: center;
+    justify-content: center; /* Center the main content */
     align-items: center;
     background-color: var(--primary-red);
     color: white;
-    padding: 15px;
+    padding: 12px;
     margin: -20px -20px 20px -20px;
     text-align: center;
     font-size: 1.3rem;
     font-weight: bold;
+    position: relative; /* Enable absolute positioning for About button */
+}
+
+.btn-about {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-weight: bold;
+    transition: background-color 0.2s;
+    border-radius: 4px;
+    position: absolute; /* Position absolutely within the header */
+    right: 12px; /* Position on the right side */
+    top: 50%; /* Center vertically */
+    transform: translateY(-50%); /* Perfect vertical centering */
+}
+
+.btn-about:hover {
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 .btn-create-header {
     background-color: rgba(255, 255, 255, 0.2);
     color: white;
     border: 2px solid white;
-    padding: 12px 24px;
-    font-size: 1.1rem;
+    padding: 8px 20px;
+    font-size: 1rem;
     cursor: pointer;
     font-family: 'Cinzel', serif;
     font-weight: bold;
@@ -107,13 +177,13 @@ h2 {
 #squads-list {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 10px;
 }
 
 .squad-box {
     background-color: var(--box-background);
     border: 1px solid var(--border-color);
-    padding: 15px;
+    padding: 10px;
     transition: background-color 0.2s;
     cursor: pointer;
 }
@@ -130,7 +200,7 @@ h2 {
 
 .squad-name {
     font-weight: bold;
-    margin-bottom: 5px;
+    margin-bottom: 3px;
     font-size: 1.1rem;
     color: var(--primary-red);
     cursor: pointer;
@@ -144,7 +214,7 @@ h2 {
     font-size: 0.9rem;
     color: #666;
     font-style: italic;
-    margin-bottom: 5px;
+    margin-bottom: 3px;
 }
 
 .squad-description {
@@ -170,13 +240,13 @@ h2 {
 #squad-units-list {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 10px;
 }
 
 .unit-display-box {
     background-color: var(--box-background);
     border: 1px solid var(--border-color);
-    padding: 15px;
+    padding: 10px;
     transition: background-color 0.2s;
 }
 
@@ -190,7 +260,7 @@ h2 {
 .unit-details {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    gap: 8px;
     font-size: 0.9rem;
 }
 
@@ -479,4 +549,107 @@ select:focus {
         padding: 12px 20px;
         font-size: 1rem;
     }
+}
+
+/* ============================
+   ABOUT POPUP
+   ============================ */
+
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.popup-content {
+    background-color: var(--box-background);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.popup-header {
+    background-color: var(--primary-red);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 6px 6px 0 0;
+}
+
+.popup-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.popup-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.popup-close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.popup-body {
+    padding: 20px;
+    line-height: 1.6;
+}
+
+.popup-body h4 {
+    color: var(--primary-red);
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.popup-body h4:first-child {
+    margin-top: 0;
+}
+
+.popup-body ul,
+.popup-body ol {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+.popup-body li {
+    margin-bottom: 5px;
+}
+
+.popup-body p {
+    margin: 10px 0;
+}
+
+.popup-body strong {
+    color: var(--primary-red);
+}
+
+.popup-body em {
+    color: #666;
+    font-style: italic;
 } 
