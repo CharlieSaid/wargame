@@ -143,13 +143,8 @@ class WargameApp {
             });
             document.querySelector(`[data-squad-id="${squadId}"]`).classList.add('selected');
             
-            // Update header button text
-            const headerButton = document.getElementById('create-squad-btn');
-            const squadName = document.querySelector(`[data-squad-id="${squadId}"] .squad-name`).textContent;
-            headerButton.textContent = squadName;
-            
             // Hide creation form and show units
-            this.hideCreateForm();
+            document.getElementById('create-form-container').style.display = 'none';
             document.getElementById('squad-units-container').style.display = 'block';
             
             // Load squad units
@@ -230,9 +225,6 @@ class WargameApp {
         document.getElementById('squad-units-container').style.display = 'none';
         document.getElementById('create-form-container').style.display = 'block';
         
-        // Update header button text
-        document.getElementById('create-squad-btn').textContent = 'Create Squad';
-        
         // Clear selection
         document.querySelectorAll('.squad-box').forEach(box => {
             box.classList.remove('selected');
@@ -252,11 +244,6 @@ class WargameApp {
          * Hide the creation form, show appropriate content
          */
         document.getElementById('create-form-container').style.display = 'none';
-        
-        // Show create button if no squad is selected
-        if (!this.selectedSquad) {
-            document.getElementById('create-squad-btn').textContent = 'Create Squad';
-        }
         
         // Clear form fields
         document.getElementById('squad-name').value = '';
