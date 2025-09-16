@@ -173,7 +173,7 @@ class WargameApp {
         console.log(`Loading units for squad ID: ${squadId}`);
         
         try {
-            const url = `${this.apiUrl}/units?squad_id=${squadId}`;
+            const url = `${this.apiUrl}/squads/${squadId}/units`;
             console.log(`Fetching from URL: ${url}`);
             
             const response = await fetch(url);
