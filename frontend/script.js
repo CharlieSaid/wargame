@@ -136,12 +136,20 @@ class WargameApp {
         /**
          * Select a squad and load its units
          */
+        console.log(`selectSquad called with squadId: ${squadId} (type: ${typeof squadId})`);
+        
         try {
             // Update visual selection
             document.querySelectorAll('.squad-box').forEach(box => {
                 box.classList.remove('selected');
             });
-            document.querySelector(`[data-squad-id="${squadId}"]`).classList.add('selected');
+            const selectedBox = document.querySelector(`[data-squad-id="${squadId}"]`);
+            if (selectedBox) {
+                selectedBox.classList.add('selected');
+                console.log(`Selected squad box found and highlighted`);
+            } else {
+                console.error(`Could not find squad box with data-squad-id="${squadId}"`);
+            }
             
             // Hide creation form and show units
             document.getElementById('create-form-container').style.display = 'none';
@@ -162,14 +170,26 @@ class WargameApp {
         /**
          * Load and display units for the selected squad
          */
+        console.log(`Loading units for squad ID: ${squadId}`);
+        
         try {
-            const response = await fetch(`${this.apiUrl}/units?squad_id=${squadId}`);
+            const url = `${this.apiUrl}/units?squad_id=${squadId}`;
+            console.log(`Fetching from URL: ${url}`);
+            
+            const response = await fetch(url);
+            console.log(`Response status: ${response.status}`);
+            console.log(`Response ok: ${response.ok}`);
+            
             if (response.ok) {
                 const units = await response.json();
+                console.log(`Raw units data:`, units);
+                console.log(`Units array length: ${units.length}`);
+                
                 this.displaySquadUnits(units);
                 console.log(`Loaded ${units.length} units for squad ${squadId}`);
             } else {
-                console.error("Failed to load squad units");
+                const errorText = await response.text();
+                console.error(`Failed to load squad units. Status: ${response.status}, Error: ${errorText}`);
                 this.displaySquadUnits([]);
             }
         } catch (error) {
@@ -182,23 +202,34 @@ class WargameApp {
         /**
          * Display units for the selected squad
          */
+        console.log(`Displaying ${units.length} units`);
+        console.log('Units data:', units);
+        
         const unitsList = document.getElementById('squad-units-list');
+        if (!unitsList) {
+            console.error('Could not find #squad-units-list element');
+            return;
+        }
+        
         unitsList.innerHTML = '';
 
-        if (units.length === 0) {
+        if (!units || units.length === 0) {
             // Show empty state
+            console.log('No units found, showing empty state');
             const emptyMessage = document.createElement('div');
             emptyMessage.className = 'placeholder-content';
             emptyMessage.innerHTML = 'No units in this squad.';
             unitsList.appendChild(emptyMessage);
         } else {
             // Create unit display boxes
-            units.forEach(unit => {
+            console.log(`Creating display for ${units.length} units`);
+            units.forEach((unit, index) => {
+                console.log(`Unit ${index}:`, unit);
                 const unitBox = document.createElement('div');
                 unitBox.className = 'unit-display-box';
                 
                 unitBox.innerHTML = `
-                    <div class="unit-name">${unit.name}</div>
+                    <div class="unit-name">${unit.name || 'Unnamed Unit'}</div>
                     <div class="unit-details">
                         <div class="unit-detail"><strong>Race:</strong> ${unit.race || 'None'}</div>
                         <div class="unit-detail"><strong>Class:</strong> ${unit.class || 'Basic'}</div>
