@@ -17,6 +17,7 @@ class WargameApp {
         // State tracking
         this.gameData = {}; // Cache for races, classes, armors, weapons
         this.unitCounter = 0; // For unique unit IDs in the form
+        this.selectedSquad = null; // Currently selected squad
         
         // Start the app
         this.init();
@@ -100,7 +101,7 @@ class WargameApp {
 
     displaySquads(squads) {
         /**
-         * Display squads in the left column (simple list, no interactions)
+         * Display squads in the left column with click functionality
          */
         const squadsList = document.getElementById('squads-list');
         squadsList.innerHTML = '';
@@ -112,20 +113,108 @@ class WargameApp {
             emptyMessage.innerHTML = 'No squads yet.<br>Create the first one!';
             squadsList.appendChild(emptyMessage);
         } else {
-            // Create squad boxes (display only)
+            // Create squad boxes with click functionality
             squads.forEach(squad => {
                 const squadBox = document.createElement('div');
                 squadBox.className = 'squad-box';
+                squadBox.dataset.squadId = squad.id;
                 
                 const commanderText = squad.commander ? `Commander: ${squad.commander}` : 'No commander assigned';
                 
                 squadBox.innerHTML = `
-                    <div class="squad-name">${squad.name}</div>
+                    <div class="squad-name" onclick="app.selectSquad(${squad.id})">${squad.name}</div>
                     <div class="squad-commander">${commanderText}</div>
                     <div class="squad-description">${squad.description || 'No description'}</div>
                 `;
                 
                 squadsList.appendChild(squadBox);
+            });
+        }
+    }
+
+    async selectSquad(squadId) {
+        /**
+         * Select a squad and load its units
+         */
+        try {
+            // Update visual selection
+            document.querySelectorAll('.squad-box').forEach(box => {
+                box.classList.remove('selected');
+            });
+            document.querySelector(`[data-squad-id="${squadId}"]`).classList.add('selected');
+            
+            // Update header button text
+            const headerButton = document.getElementById('create-squad-btn');
+            const squadName = document.querySelector(`[data-squad-id="${squadId}"] .squad-name`).textContent;
+            headerButton.textContent = squadName;
+            
+            // Hide creation form and show units
+            this.hideCreateForm();
+            document.getElementById('squad-units-container').style.display = 'block';
+            
+            // Load squad units
+            await this.loadSquadUnits(squadId);
+            
+            this.selectedSquad = squadId;
+            console.log(`Selected squad: ${squadId}`);
+            
+        } catch (error) {
+            console.error('Error selecting squad:', error);
+        }
+    }
+
+    async loadSquadUnits(squadId) {
+        /**
+         * Load and display units for the selected squad
+         */
+        try {
+            const response = await fetch(`${this.apiUrl}/units?squad_id=${squadId}`);
+            if (response.ok) {
+                const units = await response.json();
+                this.displaySquadUnits(units);
+                console.log(`Loaded ${units.length} units for squad ${squadId}`);
+            } else {
+                console.error("Failed to load squad units");
+                this.displaySquadUnits([]);
+            }
+        } catch (error) {
+            console.error("Error loading squad units:", error);
+            this.displaySquadUnits([]);
+        }
+    }
+
+    displaySquadUnits(units) {
+        /**
+         * Display units for the selected squad
+         */
+        const unitsList = document.getElementById('squad-units-list');
+        unitsList.innerHTML = '';
+
+        if (units.length === 0) {
+            // Show empty state
+            const emptyMessage = document.createElement('div');
+            emptyMessage.className = 'placeholder-content';
+            emptyMessage.innerHTML = 'No units in this squad.';
+            unitsList.appendChild(emptyMessage);
+        } else {
+            // Create unit display boxes
+            units.forEach(unit => {
+                const unitBox = document.createElement('div');
+                unitBox.className = 'unit-display-box';
+                
+                unitBox.innerHTML = `
+                    <div class="unit-name">${unit.name}</div>
+                    <div class="unit-details">
+                        <div class="unit-detail"><strong>Race:</strong> ${unit.race || 'None'}</div>
+                        <div class="unit-detail"><strong>Class:</strong> ${unit.class || 'Basic'}</div>
+                        <div class="unit-detail"><strong>Level:</strong> ${unit.level || 1}</div>
+                        <div class="unit-detail"><strong>Armor:</strong> ${unit.armor || 'None'}</div>
+                        <div class="unit-detail"><strong>Weapon:</strong> ${unit.weapon || 'None'}</div>
+                        <div class="unit-detail"><strong>HP:</strong> ${unit.hp || 'N/A'}</div>
+                    </div>
+                `;
+                
+                unitsList.appendChild(unitBox);
             });
         }
     }
@@ -136,10 +225,19 @@ class WargameApp {
 
     showCreateForm() {
         /**
-         * Show the creation form, hide the create button
+         * Show the creation form, hide other content
          */
-        document.getElementById('create-button-container').style.display = 'none';
+        document.getElementById('squad-units-container').style.display = 'none';
         document.getElementById('create-form-container').style.display = 'block';
+        
+        // Update header button text
+        document.getElementById('create-squad-btn').textContent = 'Create Squad';
+        
+        // Clear selection
+        document.querySelectorAll('.squad-box').forEach(box => {
+            box.classList.remove('selected');
+        });
+        this.selectedSquad = null;
         
         // Reset unit counter
         this.unitCounter = 0;
@@ -151,10 +249,14 @@ class WargameApp {
 
     hideCreateForm() {
         /**
-         * Hide the creation form, show the create button, clear form
+         * Hide the creation form, show appropriate content
          */
         document.getElementById('create-form-container').style.display = 'none';
-        document.getElementById('create-button-container').style.display = 'block';
+        
+        // Show create button if no squad is selected
+        if (!this.selectedSquad) {
+            document.getElementById('create-squad-btn').textContent = 'Create Squad';
+        }
         
         // Clear form fields
         document.getElementById('squad-name').value = '';

@@ -21,15 +21,19 @@
             </div>
         </div>
 
-        <!-- RIGHT HALF: Squad Creation -->
+        <!-- RIGHT HALF: Squad Details/Creation -->
         <div class="right-half">
-            <h2>Create</h2>
-            
-            <!-- Initial state: Just the create button -->
-            <div id="create-button-container">
-                <button id="create-squad-btn" class="btn-create" onclick="showCreateForm()">
+            <h2 id="right-header">
+                <button id="create-squad-btn" class="btn-create-header" onclick="showCreateForm()">
                     Create Squad
                 </button>
+            </h2>
+            
+            <!-- Squad Units Display (hidden initially) -->
+            <div id="squad-units-container" style="display: none;">
+                <div id="squad-units-list">
+                    <!-- Units will be loaded here when squad is selected -->
+                </div>
             </div>
             
             <!-- Creation form (hidden initially) -->

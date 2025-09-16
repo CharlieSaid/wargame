@@ -70,6 +70,36 @@ h2 {
     font-weight: bold;
 }
 
+/* Right header with centered button */
+#right-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--primary-red);
+    color: white;
+    padding: 15px;
+    margin: -20px -20px 20px -20px;
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+.btn-create-header {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid white;
+    padding: 12px 24px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.btn-create-header:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
 /* ============================
    LEFT HALF - SQUAD LIST
    ============================ */
@@ -85,10 +115,17 @@ h2 {
     border: 1px solid var(--border-color);
     padding: 15px;
     transition: background-color 0.2s;
+    cursor: pointer;
 }
 
 .squad-box:hover {
     background-color: #f9f9f9;
+}
+
+.squad-box.selected {
+    background-color: #f0f8ff;
+    border-color: var(--primary-red);
+    border-width: 2px;
 }
 
 .squad-name {
@@ -96,6 +133,11 @@ h2 {
     margin-bottom: 5px;
     font-size: 1.1rem;
     color: var(--primary-red);
+    cursor: pointer;
+}
+
+.squad-name:hover {
+    text-decoration: underline;
 }
 
 .squad-commander {
@@ -118,12 +160,52 @@ h2 {
 }
 
 /* ============================
+   RIGHT HALF - SQUAD UNITS DISPLAY
+   ============================ */
+
+#squad-units-container {
+    animation: fadeIn 0.3s ease-in;
+}
+
+#squad-units-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.unit-display-box {
+    background-color: var(--box-background);
+    border: 1px solid var(--border-color);
+    padding: 15px;
+    transition: background-color 0.2s;
+}
+
+.unit-name {
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+    color: var(--primary-red);
+}
+
+.unit-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    font-size: 0.9rem;
+}
+
+.unit-detail {
+    color: #666;
+}
+
+.unit-detail strong {
+    color: var(--text-color);
+}
+
+/* ============================
    RIGHT HALF - SQUAD CREATION
    ============================ */
 
-#create-button-container {
-    text-align: center;
-}
 
 #create-form-container {
     animation: fadeIn 0.3s ease-in;
@@ -356,6 +438,16 @@ select:focus {
         margin: -15px -15px 15px -15px;
     }
     
+    #right-header {
+        padding: 12px;
+        margin: -15px -15px 15px -15px;
+    }
+    
+    .btn-create-header {
+        padding: 10px 20px;
+        font-size: 1rem;
+    }
+    
     .form-section {
         padding: 15px;
     }
@@ -369,6 +461,11 @@ select:focus {
     .unit-attributes-grid {
         grid-template-columns: 1fr;
         gap: 10px;
+    }
+    
+    .unit-details {
+        grid-template-columns: 1fr;
+        gap: 8px;
     }
     
     .form-buttons {
