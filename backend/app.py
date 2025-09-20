@@ -10,6 +10,8 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 import os
+import glob
+import re
 
 # ============================
 # CONFIGURATION & SETUP
@@ -266,6 +268,52 @@ def get_weapons():
         query = "SELECT name, damage, damage_type, range, description FROM weapons ORDER BY damage"
         weapons = execute_query(query, fetch_all=True)
         return jsonify(weapons), 200
+    except Exception as e:
+        return handle_error(e)
+
+# ============================
+# BATTLE REPORT ENDPOINT
+# ============================
+
+@app.route("/api/battle-report", methods=["GET"])
+def get_latest_battle_report():
+    """Get the content of the most recent battle report file"""
+    try:
+        # Get the directory where this script is located
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        # Go up one level to get the project root, then into reports
+        reports_dir = os.path.join(os.path.dirname(script_dir), "reports")
+        
+        # Find all battle report files
+        pattern = os.path.join(reports_dir, "battle_report_*.txt")
+        report_files = glob.glob(pattern)
+        
+        if not report_files:
+            return jsonify({
+                "content": "No battle reports found.",
+                "filename": None,
+                "timestamp": None
+            }), 200
+        
+        # Sort files by modification time (most recent first)
+        report_files.sort(key=os.path.getmtime, reverse=True)
+        latest_file = report_files[0]
+        
+        # Extract timestamp from filename
+        filename = os.path.basename(latest_file)
+        timestamp_match = re.search(r'battle_report_(\d{8}_\d{6})\.txt', filename)
+        timestamp = timestamp_match.group(1) if timestamp_match else None
+        
+        # Read the file content
+        with open(latest_file, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        return jsonify({
+            "content": content,
+            "filename": filename,
+            "timestamp": timestamp
+        }), 200
+        
     except Exception as e:
         return handle_error(e)
 

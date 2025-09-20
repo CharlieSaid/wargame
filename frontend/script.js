@@ -583,9 +583,102 @@ function hideAboutPopup() {
 // BATTLE REPORT POPUP FUNCTIONS
 // ============================
 
-function showBattleReportPopup() {
-    document.getElementById('battle-report-popup').style.display = 'flex';
+async function showBattleReportPopup() {
     console.log("Showing battle report popup");
+    
+    // Show the popup first
+    document.getElementById('battle-report-popup').style.display = 'flex';
+    
+    // Show loading state
+    const popupBody = document.querySelector('#battle-report-popup .popup-body');
+    popupBody.innerHTML = '<p>Loading battle report...</p>';
+    
+    try {
+        // Fetch the latest battle report
+        const response = await fetch(`${app.apiUrl}/battle-report`);
+        const data = await response.json();
+        
+        if (response.ok) {
+            // Display the battle report content
+            displayBattleReport(data);
+        } else {
+            // Show error message
+            popupBody.innerHTML = `
+                <p><strong>Error loading battle report:</strong></p>
+                <p>${data.error || 'Unknown error occurred'}</p>
+            `;
+        }
+    } catch (error) {
+        console.error('Error fetching battle report:', error);
+        popupBody.innerHTML = `
+            <p><strong>Error loading battle report:</strong></p>
+            <p>Failed to connect to server. Please try again later.</p>
+        `;
+    }
+}
+
+function displayBattleReport(data) {
+    const popupBody = document.querySelector('#battle-report-popup .popup-body');
+    
+    if (!data.content || data.content === "No battle reports found.") {
+        popupBody.innerHTML = `
+            <p><strong>No Battle Reports Available</strong></p>
+            <p>No recent battles have been recorded. Battles occur automatically every 2 hours when there are enough squads in the system.</p>
+            
+            <h4>Battle System:</h4>
+            <ul>
+                <li>Battles are automatically scheduled every 2 hours</li>
+                <li>Requires a minimum number of squads to trigger</li>
+                <li>Squads compete based on their unit composition and stats</li>
+                <li>Winners gain experience and ranking</li>
+            </ul>
+            
+            <h4>Next Battle:</h4>
+            <p><em>Waiting for sufficient squads to be created...</em></p>
+            
+            <p><strong>Current Status:</strong> Battle system is active and monitoring for new squads.</p>
+        `;
+        return;
+    }
+    
+    // Format the battle report content
+    const lines = data.content.split('\n');
+    let formattedContent = '';
+    
+    // Add header with timestamp if available
+    if (data.timestamp) {
+        const dateStr = data.timestamp.substring(0, 8); // YYYYMMDD
+        const timeStr = data.timestamp.substring(9, 15); // HHMMSS
+        const formattedDate = `${dateStr.substring(0,4)}-${dateStr.substring(4,6)}-${dateStr.substring(6,8)}`;
+        const formattedTime = `${timeStr.substring(0,2)}:${timeStr.substring(2,4)}:${timeStr.substring(4,6)}`;
+        
+        formattedContent += `<p><strong>Battle Report - ${formattedDate} at ${formattedTime}</strong></p>`;
+    }
+    
+    // Process each line of the battle report
+    lines.forEach(line => {
+        line = line.trim();
+        if (!line) return;
+        
+        // Format different types of lines
+        if (line.includes('begin to fight!')) {
+            formattedContent += `<h4 style="color: #d4af37; margin: 15px 0 10px 0;">${line}</h4>`;
+        } else if (line.includes('has been defeated!')) {
+            formattedContent += `<p style="color: #dc3545; font-weight: bold;">${line}</p>`;
+        } else if (line.includes('The battle is over!')) {
+            formattedContent += `<h4 style="color: #28a745; margin: 15px 0 10px 0;">${line}</h4>`;
+        } else if (line.includes('now has') && line.includes('health remaining')) {
+            formattedContent += `<p style="color: #6c757d; margin-left: 20px;">${line}</p>`;
+        } else if (line.includes('now attacks')) {
+            formattedContent += `<p style="color: #007bff; font-weight: bold; margin: 10px 0 5px 0;">${line}</p>`;
+        } else if (line.includes('rolls a') && (line.includes('to attack') || line.includes('to defend'))) {
+            formattedContent += `<p style="color: #6c757d; margin-left: 20px; font-style: italic;">${line}</p>`;
+        } else {
+            formattedContent += `<p>${line}</p>`;
+        }
+    });
+    
+    popupBody.innerHTML = formattedContent;
 }
 
 function hideBattleReportPopup() {
