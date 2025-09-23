@@ -17,10 +17,10 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.13'
           
       - name: Cache pip dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -36,21 +36,21 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          echo "🔄 Starting recruitment process..."
+          echo "Starting recruitment process..."
           python recruit.py
-          echo "✅ Recruitment completed"
+          echo "Recruitment completed"
           
       - name: Run battle script
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          echo "⚔️ Starting battle process..."
+          echo "Starting battle process..."
           python battle.py
-          echo "✅ Battle completed"
+          echo "Battle completed"
           
       - name: Upload battle reports
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: battle-reports-${{ github.run_number }}
           path: reports/
@@ -58,7 +58,7 @@ jobs:
           
       - name: Upload logs
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: scheduler-logs-${{ github.run_number }}
           path: |

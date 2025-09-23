@@ -13,13 +13,6 @@ Runs your `battle.py` and `recruit.py` scripts every 2 hours automatically.
 5. Value: Your Neon database connection string
 6. Click **Add secret**
 
-### 2. Commit the Workflow
-```bash
-git add .github/workflows/scheduler.yml
-git commit -m "Add scheduler"
-git push
-```
-
 ### 3. Test It
 1. Go to **Actions** tab in your repository
 2. Click **Wargame Scheduler**
