@@ -1,0 +1,67 @@
+name: Wargame Scheduler
+
+on:
+  schedule:
+    # Run every 2 hours on the hour (00:00, 02:00, 04:00, etc.)
+    - cron: '0 */2 * * *'
+  workflow_dispatch:  # Allow manual triggers for testing
+
+jobs:
+  run-game-scripts:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+            
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          
+      - name: Run recruitment script
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          echo "🔄 Starting recruitment process..."
+          python recruit.py
+          echo "✅ Recruitment completed"
+          
+      - name: Run battle script
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          echo "⚔️ Starting battle process..."
+          python battle.py
+          echo "✅ Battle completed"
+          
+      - name: Upload battle reports
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: battle-reports-${{ github.run_number }}
+          path: reports/
+          retention-days: 30
+          
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: scheduler-logs-${{ github.run_number }}
+          path: |
+            scheduler.log
+            logs/
+          retention-days: 30
