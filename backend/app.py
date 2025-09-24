@@ -109,6 +109,17 @@ def create_squad():
     description = data.get("description", "")
     
     try:
+        # Check squad count limit (5,000 squads max)
+        count_query = "SELECT COUNT(*) FROM squads"
+        squad_count = execute_query(count_query, fetch_one=True)
+        
+        MAX_SQUADS = 5000
+        
+        if squad_count and squad_count['count'] >= MAX_SQUADS:
+            return jsonify({
+                "error": f"Maximum number of squads reached ({MAX_SQUADS:,}). No new squads can be created."
+            }), 429  # Too Many Requests
+        
         query = "INSERT INTO squads (name, commander, description) VALUES (%s, %s, %s) RETURNING id, name, commander, description"
         squad = execute_query(query, (name, commander, description), fetch_one=True)
         return jsonify(squad), 201

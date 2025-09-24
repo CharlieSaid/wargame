@@ -246,6 +246,9 @@ class WargameApp {
             document.getElementById('create-form-container').style.display = 'none';
             document.getElementById('squad-units-container').style.display = 'block';
             
+            // Show loading message immediately
+            this.showSquadUnitsLoading();
+            
             // Load squad units
             await this.loadSquadUnits(squadId);
             
@@ -254,6 +257,21 @@ class WargameApp {
             
         } catch (error) {
             console.error('Error selecting squad:', error);
+        }
+    }
+
+    showSquadUnitsLoading() {
+        /**
+         * Show loading message while squad units are being fetched
+         */
+        const unitsList = document.getElementById('squad-units-list');
+        if (unitsList) {
+            unitsList.innerHTML = `
+                <div class="loading-message">
+                    <div class="loading-spinner"></div>
+                    <p>Loading squad units...</p>
+                </div>
+            `;
         }
     }
 

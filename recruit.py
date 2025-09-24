@@ -154,6 +154,13 @@ def main():
     squad_count = count_squads()
     print(f"Squad count: {squad_count}")
     
+    # Check if we've hit the maximum squad limit (5,000)
+    MAX_SQUADS = 5000
+    if squad_count >= MAX_SQUADS:
+        print(f"Squad count ({squad_count}) has reached the maximum limit ({MAX_SQUADS}). No new squads can be created.")
+        print("Ending.")
+        return
+    
     # Check if we need to recruit more squads
     if squad_count < RECRUIT_THRESHOLD:
         print(f"Squad count ({squad_count}) is below threshold ({RECRUIT_THRESHOLD}). Beginning recruitment...")
