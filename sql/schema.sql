@@ -47,10 +47,12 @@ CREATE TABLE weapons (
 
 -- Squads table: Anyone can create and view squads
 -- commander is the name of the person who created the squad
+-- level represents the squad's battle experience and ranking
 CREATE TABLE squads (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     commander VARCHAR(100),
+    level INTEGER DEFAULT 1 CHECK (level >= 1),
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     description VARCHAR(1000)
 );
@@ -62,7 +64,6 @@ CREATE TABLE units (
     name VARCHAR(100) NOT NULL,
     race VARCHAR(50) REFERENCES races(name),
     class VARCHAR(50) NOT NULL REFERENCES classes(name),
-    level INTEGER NOT NULL CHECK (level > 0 AND level <= 1000),
     armor VARCHAR(50) REFERENCES armors(name),
     weapon VARCHAR(50) REFERENCES weapons(name),
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
@@ -85,7 +86,8 @@ CREATE INDEX idx_units_race ON units(race);
 CREATE INDEX idx_units_class ON units(class);
 CREATE INDEX idx_units_armor ON units(armor);
 CREATE INDEX idx_units_weapon ON units(weapon);
-CREATE INDEX idx_units_level ON units(level);
+CREATE INDEX idx_squads_level ON squads(level);
+CREATE INDEX idx_squads_created_at ON squads(created_at);
 CREATE INDEX idx_battle_reports_created_at ON battle_reports(created_at);
 CREATE INDEX idx_battle_reports_winner ON battle_reports(winner_squad_id);
 CREATE INDEX idx_battle_reports_loser ON battle_reports(loser_squad_id);

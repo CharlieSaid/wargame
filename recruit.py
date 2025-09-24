@@ -28,11 +28,11 @@ def create_squad(name, commander, description):
         params=(name, commander, description)
     )
 
-def create_unit(squad_id, name, race, unit_class, level, armor, weapon):
+def create_unit(squad_id, name, race, unit_class, armor, weapon):
     """Create a new unit for a squad"""
     return execute_sql(
-        "INSERT INTO units (squad_id, name, race, class, level, armor, weapon) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-        params=(squad_id, name, race, unit_class, level, armor, weapon)
+        "INSERT INTO units (squad_id, name, race, class, armor, weapon) VALUES (%s, %s, %s, %s, %s, %s)",
+        params=(squad_id, name, race, unit_class, armor, weapon)
     )
 
 def generate_squad_name():
@@ -97,12 +97,11 @@ def generate_squad():
         unit_name = generate_unit_name()
         race = random.choice(races)
         unit_class = random.choice(classes)
-        level = 1  # All units start at level 1
         armor = random.choice(armors)
         weapon = random.choice(weapons)
         
         # Create the unit
-        create_unit(squad_id, unit_name, race, unit_class, level, armor, weapon)
+        create_unit(squad_id, unit_name, race, unit_class, armor, weapon)
         print(f"  Created unit: {unit_name} - {race} {unit_class} wearing {armor} and wielding {weapon}")
     
     print(f"Squad {squad_name} recruitment complete!")

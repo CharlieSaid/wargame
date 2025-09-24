@@ -241,6 +241,7 @@ class WargameApp {
                 
                 squadBox.innerHTML = `
                     <div class="squad-name" onclick="app.selectSquad(${squad.id})">${squad.name}</div>
+                    <div class="squad-level">Level ${squad.level || 1}</div>
                     <div class="squad-commander">${commanderText}</div>
                     <div class="squad-description">${squad.description || 'No description'}</div>
                 `;
@@ -369,7 +370,6 @@ class WargameApp {
                     <div class="unit-details">
                         <div class="unit-detail"><strong>Race:</strong> ${unit.race || 'None'}</div>
                         <div class="unit-detail"><strong>Class:</strong> ${unit.class || 'Basic'}</div>
-                        <div class="unit-detail"><strong>Level:</strong> ${unit.level || 1}</div>
                         <div class="unit-detail"><strong>Armor:</strong> ${unit.armor || 'None'}</div>
                         <div class="unit-detail"><strong>Weapon:</strong> ${unit.weapon || 'None'}</div>
                         <div class="unit-detail"><strong>HP:</strong> ${unit.hp || 'N/A'}</div>
@@ -643,7 +643,6 @@ class WargameApp {
                             name: unit.name,
                             race: unit.race || null,
                             class: unit.class || 'Basic',
-                            level: 1,
                             armor: unit.armor || null,
                             weapon: unit.weapon || null
                         })

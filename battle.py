@@ -207,6 +207,15 @@ def main():
         print(f"The winner is {winner_name}!")
         print(f"The loser is {loser_name}!")
         
+        # Level up the winning squad
+        level_up_query = "UPDATE squads SET level = level + 1 WHERE id = %s"
+        execute_sql(level_up_query, params=(winner_squad_id,))
+        
+        # Get the new level for confirmation
+        new_level_result = execute_sql("SELECT level FROM squads WHERE id = %s", fetch_one=True, params=(winner_squad_id,))
+        new_level = new_level_result['level'] if new_level_result else 'unknown'
+        print(f"{winner_name} leveled up to level {new_level}!")
+        
         # Drop the losing squad from the database
         execute_sql("DELETE FROM squads WHERE id = %s", params=(loser_squad_id,))
 

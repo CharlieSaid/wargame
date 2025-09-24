@@ -128,7 +128,7 @@ def create_squad():
 @app.route("/api/squads", methods=["GET"])
 def get_all_squads():
     try:
-        query = "SELECT id, name, commander, description, created_at FROM squads ORDER BY created_at DESC"
+        query = "SELECT id, name, commander, description, level, created_at FROM squads ORDER BY level DESC, created_at DESC"
         squads = execute_query(query, fetch_all=True)
         return jsonify(squads), 200
     except Exception as e:
@@ -138,7 +138,7 @@ def get_all_squads():
 @app.route("/api/squads/<int:squad_id>", methods=["GET"])
 def get_squad(squad_id):
     try:
-        query = "SELECT id, name, commander, description, created_at FROM squads WHERE id = %s"
+        query = "SELECT id, name, commander, description, level, created_at FROM squads WHERE id = %s"
         squad = execute_query(query, (squad_id,), fetch_one=True)
         
         if squad:
@@ -194,7 +194,6 @@ def create_unit():
     name = data.get("name")
     race = data.get("race")
     unit_class = data.get("class")
-    level = data.get("level", 1)  # Default to level 1
     armor = data.get("armor")
     weapon = data.get("weapon")
     
@@ -206,10 +205,10 @@ def create_unit():
         if unit_count and unit_count['count'] >= 4:
             return jsonify({"error": "Squad already has the maximum of 4 units"}), 400
         
-        query = """INSERT INTO units (squad_id, name, race, class, level, armor, weapon) 
-                   VALUES (%s, %s, %s, %s, %s, %s, %s) 
-                   RETURNING id, name, race, class, level, armor, weapon"""
-        unit = execute_query(query, (squad_id, name, race, unit_class, level, armor, weapon), fetch_one=True)
+        query = """INSERT INTO units (squad_id, name, race, class, armor, weapon) 
+                   VALUES (%s, %s, %s, %s, %s, %s) 
+                   RETURNING id, name, race, class, armor, weapon"""
+        unit = execute_query(query, (squad_id, name, race, unit_class, armor, weapon), fetch_one=True)
         return jsonify(unit), 201
     except Exception as e:
         return handle_error(e)
