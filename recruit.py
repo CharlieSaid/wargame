@@ -1,77 +1,38 @@
 import datetime
 import os
 import random
-import psycopg2
-from psycopg2.extras import RealDictCursor
-from dotenv import load_dotenv
+from db_utils import execute_sql
 
 RECRUIT_THRESHOLD = 20
 
-def get_db_connection():
-    load_dotenv()
-    database_url = os.getenv("DATABASE_URL")
-    
-    if not database_url:
-        raise ValueError("DATABASE_URL environment variable not found")
-    
-    return psycopg2.connect(database_url, cursor_factory=RealDictCursor)
-
-def execute_sql(sql, error_message = None, fetchall = False, fetchone = False, params = None):
-    load_dotenv()
-    database_url = os.getenv("DATABASE_URL")
-    
-    if not database_url:
-        raise ValueError("DATABASE_URL environment variable not found")
-    
-    conn =  psycopg2.connect(database_url, cursor_factory=RealDictCursor)
-
-    try:
-        with conn.cursor() as cursor:
-            cursor.execute(sql, params)
-            
-            result = None
-            if fetchall:
-                result = cursor.fetchall()
-            elif fetchone:
-                result = cursor.fetchone()
-            # Don't fetch anything for INSERT/UPDATE/DELETE operations
-            
-            conn.commit()
-            return result
-    except Exception as e:
-        print(f"{error_message}: {e}")
-        return None
-
 def count_squads():
-    return execute_sql("SELECT COUNT(*) as squad_count FROM squads", "Error counting squads", fetchone = True)['squad_count']
+    return execute_sql("SELECT COUNT(*) as squad_count FROM squads", fetch_one=True)['squad_count']
 
 def get_all_races():
-    return execute_sql("SELECT name FROM races", "Error getting races", fetchall = True)
+    return execute_sql("SELECT name FROM races", fetch_all=True)
 
 def get_all_classes():
-    return execute_sql("SELECT name FROM classes", "Error getting classes", fetchall = True)
+    return execute_sql("SELECT name FROM classes", fetch_all=True)
 
 def get_all_armors():
-    return execute_sql("SELECT name FROM armors", "Error getting armors", fetchall = True)
+    return execute_sql("SELECT name FROM armors", fetch_all=True)
 
 def get_all_weapons():
-    return execute_sql("SELECT name FROM weapons", "Error getting weapons", fetchall = True)
+    return execute_sql("SELECT name FROM weapons", fetch_all=True)
 
 def create_squad(name, commander, description):
     """Create a new squad and return its ID"""
     return execute_sql(
         "INSERT INTO squads (name, commander, description) VALUES (%s, %s, %s) RETURNING id",
-        "Error creating squad",
-        fetchone = True,
-        params = (name, commander, description)
+        fetch_one=True,
+        params=(name, commander, description)
     )
 
 def create_unit(squad_id, name, race, unit_class, level, armor, weapon):
     """Create a new unit for a squad"""
     return execute_sql(
         "INSERT INTO units (squad_id, name, race, class, level, armor, weapon) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-        "Error creating unit",
-        params = (squad_id, name, race, unit_class, level, armor, weapon)
+        params=(squad_id, name, race, unit_class, level, armor, weapon)
     )
 
 def generate_squad_name():

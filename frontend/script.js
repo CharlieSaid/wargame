@@ -659,8 +659,9 @@ class WargameApp {
                 }
             }
 
-            // Success - hide form and refresh list
+            // Success - hide form, show popup, and refresh list
             this.hideCreateForm();
+            showSuccessPopup();
             await this.loadSquads();
             
         } catch (error) {
@@ -849,6 +850,21 @@ function hideBattleReportPopup() {
     console.log("Hiding battle report popup");
 }
 
+function showSuccessPopup() {
+    document.getElementById('success-popup').style.display = 'flex';
+    console.log("Showing success popup");
+    
+    // Auto-close after 3 seconds
+    setTimeout(() => {
+        hideSuccessPopup();
+    }, 3000);
+}
+
+function hideSuccessPopup() {
+    document.getElementById('success-popup').style.display = 'none';
+    console.log("Hiding success popup");
+}
+
 // ============================
 // APPLICATION INITIALIZATION
 // ============================
@@ -875,6 +891,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (document.getElementById('battle-report-popup').style.display !== 'none') {
                 hideBattleReportPopup();
             }
+            if (document.getElementById('success-popup').style.display !== 'none') {
+                hideSuccessPopup();
+            }
         }
     });
     
@@ -882,12 +901,16 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('click', function(e) {
         const aboutPopup = document.getElementById('about-popup');
         const battleReportPopup = document.getElementById('battle-report-popup');
+        const successPopup = document.getElementById('success-popup');
         
         if (e.target === aboutPopup) {
             hideAboutPopup();
         }
         if (e.target === battleReportPopup) {
             hideBattleReportPopup();
+        }
+        if (e.target === successPopup) {
+            hideSuccessPopup();
         }
     });
 }); 

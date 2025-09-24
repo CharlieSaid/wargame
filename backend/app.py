@@ -10,8 +10,6 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 import os
-import glob
-import re
 
 # ============================
 # CONFIGURATION & SETUP
@@ -302,41 +300,40 @@ def get_weapons():
 
 @app.route("/api/battle-report", methods=["GET"])
 def get_latest_battle_report():
-    """Get the content of the most recent battle report file"""
+    """Get the content of the most recent battle report from database"""
     try:
-        # Get the directory where this script is located
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        # Go up one level to get the project root, then into reports
-        reports_dir = os.path.join(os.path.dirname(script_dir), "reports")
+        # Get the most recent battle report from database
+        query = """
+        SELECT br.id, br.report_content, br.battle_timestamp, br.created_at,
+               w.name as winner_name, l.name as loser_name
+        FROM battle_reports br
+        LEFT JOIN squads w ON br.winner_squad_id = w.id
+        LEFT JOIN squads l ON br.loser_squad_id = l.id
+        ORDER BY br.created_at DESC
+        LIMIT 1
+        """
         
-        # Find all battle report files
-        pattern = os.path.join(reports_dir, "battle_report_*.txt")
-        report_files = glob.glob(pattern)
+        report = execute_query(query, fetch_one=True)
         
-        if not report_files:
+        if not report:
             return jsonify({
                 "content": "No battle reports found.",
                 "filename": None,
-                "timestamp": None
+                "timestamp": None,
+                "winner": None,
+                "loser": None
             }), 200
         
-        # Sort files by modification time (most recent first)
-        report_files.sort(key=os.path.getmtime, reverse=True)
-        latest_file = report_files[0]
-        
-        # Extract timestamp from filename
-        filename = os.path.basename(latest_file)
-        timestamp_match = re.search(r'battle_report_(\d{8}_\d{6})\.txt', filename)
-        timestamp = timestamp_match.group(1) if timestamp_match else None
-        
-        # Read the file content
-        with open(latest_file, 'r', encoding='utf-8') as f:
-            content = f.read()
+        # Format timestamp for display
+        timestamp = report['battle_timestamp'].strftime("%Y%m%d_%H%M%S") if report['battle_timestamp'] else None
         
         return jsonify({
-            "content": content,
-            "filename": filename,
-            "timestamp": timestamp
+            "content": report['report_content'],
+            "filename": f"battle_report_{timestamp}.txt" if timestamp else "battle_report.txt",
+            "timestamp": timestamp,
+            "winner": report['winner_name'],
+            "loser": report['loser_name'],
+            "report_id": report['id']
         }), 200
         
     except Exception as e:

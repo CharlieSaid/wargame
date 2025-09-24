@@ -69,6 +69,16 @@ CREATE TABLE units (
     description VARCHAR(1000)
 );
 
+-- Battle Reports table: Store battle reports in database instead of files
+CREATE TABLE battle_reports (
+    id SERIAL PRIMARY KEY,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    winner_squad_id INTEGER REFERENCES squads(id),
+    loser_squad_id INTEGER REFERENCES squads(id),
+    report_content TEXT NOT NULL,
+    battle_timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
 -- PostgreSQL indexes for better query performance
 CREATE INDEX idx_units_squad_id ON units(squad_id);
 CREATE INDEX idx_units_race ON units(race);
@@ -76,4 +86,7 @@ CREATE INDEX idx_units_class ON units(class);
 CREATE INDEX idx_units_armor ON units(armor);
 CREATE INDEX idx_units_weapon ON units(weapon);
 CREATE INDEX idx_units_level ON units(level);
+CREATE INDEX idx_battle_reports_created_at ON battle_reports(created_at);
+CREATE INDEX idx_battle_reports_winner ON battle_reports(winner_squad_id);
+CREATE INDEX idx_battle_reports_loser ON battle_reports(loser_squad_id);
 

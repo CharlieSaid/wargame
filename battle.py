@@ -1,67 +1,29 @@
 import datetime
-import os
 import random
-import psycopg2
-from psycopg2.extras import RealDictCursor
-from dotenv import load_dotenv
+from db_utils import execute_sql
 
 BATTLE_THRESHOLD = 2
 
-def get_db_connection():
-    load_dotenv()
-    database_url = os.getenv("DATABASE_URL")
-    
-    if not database_url:
-        raise ValueError("DATABASE_URL environment variable not found")
-    
-    return psycopg2.connect(database_url, cursor_factory=RealDictCursor)
-
-def execute_sql(sql, error_message = None, fetchall = False, fetchone = False, params = None):
-    load_dotenv()
-    database_url = os.getenv("DATABASE_URL")
-    
-    if not database_url:
-        raise ValueError("DATABASE_URL environment variable not found")
-    
-    conn =  psycopg2.connect(database_url, cursor_factory=RealDictCursor)
-
-    try:
-        with conn.cursor() as cursor:
-            cursor.execute(sql, params)
-            
-            result = None
-            if fetchall:
-                result = cursor.fetchall()
-            elif fetchone:
-                result = cursor.fetchone()
-            # Don't fetch anything for INSERT/UPDATE/DELETE operations
-            
-            conn.commit()
-            return result
-    except Exception as e:
-        print(f"{error_message}: {e}")
-        return None
-
 def count_squads():
-    return execute_sql("SELECT COUNT(*) as squad_count FROM squads", "Error counting squads", fetchone = True)['squad_count']
+    return execute_sql("SELECT COUNT(*) as squad_count FROM squads", fetch_one=True)['squad_count']
 
 def select_random_squads(count):
-    return execute_sql("SELECT id, name FROM squads ORDER BY RANDOM() LIMIT %s", "Error selecting squads", fetchall = True, fetchone = False, params = (count,))
+    return execute_sql("SELECT id, name FROM squads ORDER BY RANDOM() LIMIT %s", fetch_all=True, params=(count,))
     
 def get_squad_by_id(squad_id):
-    return execute_sql("SELECT * FROM squads WHERE id = %s", "Error getting squad by id", fetchone = True, fetchall = False, params = (squad_id,))
+    return execute_sql("SELECT * FROM squads WHERE id = %s", fetch_one=True, params=(squad_id,))
 
 def get_squad_units(squad_id):
-    return execute_sql("SELECT * FROM units WHERE squad_id = %s", "Error getting squad units", fetchall = True, fetchone = False, params = (squad_id,))
+    return execute_sql("SELECT * FROM units WHERE squad_id = %s", fetch_all=True, params=(squad_id,))
 
 def get_weapon_stats(weapon_name):
-    return execute_sql("SELECT * FROM weapons WHERE name = %s", "Error getting weapon stats", fetchone = True, fetchall = False, params = (weapon_name,))
+    return execute_sql("SELECT * FROM weapons WHERE name = %s", fetch_one=True, params=(weapon_name,))
 
 def get_armor_stats(armor_name):
-    return execute_sql("SELECT * FROM armors WHERE name = %s", "Error getting armor stats", fetchone = True, fetchall = False, params = (armor_name,))
+    return execute_sql("SELECT * FROM armors WHERE name = %s", fetch_one=True, params=(armor_name,))
 
 def get_race_stats(race_name):
-    return execute_sql("SELECT * FROM races WHERE name = %s", "Error getting race stats", fetchone = True, fetchall = False, params = (race_name,))
+    return execute_sql("SELECT * FROM races WHERE name = %s", fetch_one=True, params=(race_name,))
 
 def calculate_effective_speed(unit):
     weapon_stats = get_weapon_stats(unit['weapon'])
@@ -219,21 +181,34 @@ def main():
         # Begin the battle.
         battle_report, winner_squad_id, loser_squad_id = battle(squads)
 
-        # Add the battle report to the reports folder.
-        os.makedirs('reports', exist_ok=True)
+        # Store the battle report in the database instead of files
+        report_content = '\n'.join(battle_report)
         
-        # Put the battle report in a file, line by line.
-        with open(f'reports/battle_report_{datetime.datetime.now().strftime("%Y%m%d_%H%M%S")}.txt', 'w') as file:
-            for line in battle_report:
-                file.write(line + '\n')
+        # Insert battle report into database
+        insert_query = """
+        INSERT INTO battle_reports (winner_squad_id, loser_squad_id, report_content, battle_timestamp)
+        VALUES (%s, %s, %s, %s)
+        RETURNING id
+        """
         
-        print("Battle report saved to reports folder.")
+        battle_timestamp = datetime.datetime.now()
+        report_id = execute_sql(
+            insert_query, 
+            fetch_one=True, 
+            params=(winner_squad_id, loser_squad_id, report_content, battle_timestamp)
+        )
         
-
-        print(f"The winner is {execute_sql('SELECT name FROM squads WHERE id = %s', 'Error getting winner name', fetchone = True, fetchall = False, params = (winner_squad_id,))['name']}!")
-        print(f"The loser is {execute_sql('SELECT name FROM squads WHERE id = %s', 'Error getting loser name', fetchone = True, fetchall = False, params = (loser_squad_id,))['name']}!")
-        # Drop the losing squad from the database.
-        execute_sql("DELETE FROM squads WHERE id = %s", "Error dropping losing squad", fetchone = False, fetchall = False, params = (loser_squad_id,))
+        print(f"Battle report saved to database with ID: {report_id['id']}")
+        
+        # Get winner and loser names
+        winner_name = execute_sql('SELECT name FROM squads WHERE id = %s', fetch_one=True, params=(winner_squad_id,))['name']
+        loser_name = execute_sql('SELECT name FROM squads WHERE id = %s', fetch_one=True, params=(loser_squad_id,))['name']
+        
+        print(f"The winner is {winner_name}!")
+        print(f"The loser is {loser_name}!")
+        
+        # Drop the losing squad from the database
+        execute_sql("DELETE FROM squads WHERE id = %s", params=(loser_squad_id,))
 
     print("Ending.")
 

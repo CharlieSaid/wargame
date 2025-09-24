@@ -48,14 +48,6 @@ jobs:
           python battle.py
           echo "Battle completed"
           
-      - name: Upload battle reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: battle-reports-${{ github.run_number }}
-          path: reports/
-          retention-days: 30
-          
       - name: Upload logs
         if: always()
         uses: actions/upload-artifact@v4
