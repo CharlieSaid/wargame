@@ -281,6 +281,9 @@ class WargameApp {
         // Reset unit counter
         this.unitCounter = 0;
         
+        // Update the Add Unit button
+        this.updateAddUnitButton();
+        
         // Focus on the name field
         document.getElementById('squad-name').focus();
         console.log("Showing create form");
@@ -312,6 +315,13 @@ class WargameApp {
         /**
          * Add a new unit form to the units container
          */
+        // Check if we already have 4 units (limit)
+        const existingUnits = document.querySelectorAll('.unit-form');
+        if (existingUnits.length >= 4) {
+            alert('Maximum of 4 units per squad allowed!');
+            return;
+        }
+        
         this.unitCounter++;
         const unitId = `unit-${this.unitCounter}`;
         
@@ -376,7 +386,31 @@ class WargameApp {
         // Focus on the name input
         nameInput.focus();
         
+        // Update the Add Unit button
+        this.updateAddUnitButton();
+        
         console.log(`Added unit form ${this.unitCounter}`);
+    }
+    
+    updateAddUnitButton() {
+        /**
+         * Update the Add Unit button to show current count and disable if at limit
+         */
+        const existingUnits = document.querySelectorAll('.unit-form');
+        const addUnitBtn = document.querySelector('.btn-add-unit');
+        
+        if (addUnitBtn) {
+            const count = existingUnits.length;
+            if (count >= 4) {
+                addUnitBtn.textContent = `+ Add Unit (${count}/4) - MAX REACHED`;
+                addUnitBtn.disabled = true;
+                addUnitBtn.style.opacity = '0.5';
+            } else {
+                addUnitBtn.textContent = `+ Add Unit (${count}/4)`;
+                addUnitBtn.disabled = false;
+                addUnitBtn.style.opacity = '1';
+            }
+        }
     }
 
     generateOptions(items) {
@@ -450,6 +484,12 @@ class WargameApp {
 
         // Get units data
         const units = this.collectUnitsData();
+        
+        // Validate unit count
+        if (units.length > 4) {
+            alert('Maximum of 4 units per squad allowed!');
+            return;
+        }
 
         try {
             // First, create the squad
@@ -562,6 +602,9 @@ function removeUnitForm(unitId) {
     if (unitForm) {
         unitForm.remove();
         console.log(`Removed unit form ${unitId}`);
+        
+        // Update the Add Unit button
+        app.updateAddUnitButton();
     }
 }
 

@@ -158,7 +158,14 @@ def delete_squad(squad_id):
 @app.route("/api/squads/<int:squad_id>/units", methods=["GET"])
 def get_squad_units(squad_id):
     try:
-        query = "SELECT id, name, race, class, level, armor, weapon FROM units WHERE squad_id = %s ORDER BY name"
+        # Get units with their race's base HP
+        query = """
+        SELECT u.id, u.name, u.race, u.class, u.level, u.armor, u.weapon, r.base_HP as hp
+        FROM units u
+        LEFT JOIN races r ON u.race = r.name
+        WHERE u.squad_id = %s 
+        ORDER BY u.name
+        """
         units = execute_query(query, (squad_id,), fetch_all=True)
         return jsonify(units), 200
     except Exception as e:
@@ -183,6 +190,13 @@ def create_unit():
     weapon = data.get("weapon")
     
     try:
+        # Check if squad already has 4 units (limit)
+        count_query = "SELECT COUNT(*) FROM units WHERE squad_id = %s"
+        unit_count = execute_query(count_query, (squad_id,), fetch_one=True)
+        
+        if unit_count and unit_count['count'] >= 4:
+            return jsonify({"error": "Squad already has the maximum of 4 units"}), 400
+        
         query = """INSERT INTO units (squad_id, name, race, class, level, armor, weapon) 
                    VALUES (%s, %s, %s, %s, %s, %s, %s) 
                    RETURNING id, name, race, class, level, armor, weapon"""
