@@ -15,6 +15,11 @@ import os
 # CONFIGURATION & SETUP
 # ============================
 
+# Game configuration constants
+MAX_SQUADS = 5000
+MAX_UNITS_PER_SQUAD = 4
+BATTLE_REPORT_LIMIT = 1
+
 class Config:
     """Load environment variables and configuration"""
     def __init__(self):
@@ -107,11 +112,9 @@ def create_squad():
     description = data.get("description", "")
     
     try:
-        # Check squad count limit (5,000 squads max)
+        # Check squad count limit
         count_query = "SELECT COUNT(*) FROM squads"
         squad_count = execute_query(count_query, fetch_one=True)
-        
-        MAX_SQUADS = 5000
         
         if squad_count and squad_count['count'] >= MAX_SQUADS:
             return jsonify({
@@ -169,7 +172,7 @@ def get_squad_units(squad_id):
     try:
         # Get units with their race's base HP
         query = """
-        SELECT u.id, u.name, u.race, u.class, u.level, u.armor, u.weapon, r.base_HP as hp
+        SELECT u.id, u.name, u.race, u.class, u.armor, u.weapon, r.base_HP as hp
         FROM units u
         LEFT JOIN races r ON u.race = r.name
         WHERE u.squad_id = %s 
@@ -198,12 +201,12 @@ def create_unit():
     weapon = data.get("weapon")
     
     try:
-        # Check if squad already has 4 units (limit)
+        # Check if squad already has maximum units
         count_query = "SELECT COUNT(*) FROM units WHERE squad_id = %s"
         unit_count = execute_query(count_query, (squad_id,), fetch_one=True)
         
-        if unit_count and unit_count['count'] >= 4:
-            return jsonify({"error": "Squad already has the maximum of 4 units"}), 400
+        if unit_count and unit_count['count'] >= MAX_UNITS_PER_SQUAD:
+            return jsonify({"error": f"Squad already has the maximum of {MAX_UNITS_PER_SQUAD} units"}), 400
         
         query = """INSERT INTO units (squad_id, name, race, class, armor, weapon) 
                    VALUES (%s, %s, %s, %s, %s, %s) 
@@ -213,45 +216,6 @@ def create_unit():
     except Exception as e:
         return handle_error(e)
 
-# # Update an existing unit
-# @app.route("/api/units/<int:unit_id>", methods=["PUT"])
-# def update_unit(unit_id):
-#     """Update attributes of an existing unit"""
-#     data = request.get_json()
-    
-#     if not data:
-#         return jsonify({"error": "Request body is required"}), 400
-    
-#     # Build dynamic update query based on provided fields
-#     allowed_fields = ["name", "race", "class", "level", "armor", "weapon"]
-#     updates = []
-#     values = []
-    
-#     for field in allowed_fields:
-#         if field in data:
-#             updates.append(f"{field} = %s")
-#             values.append(data[field])
-    
-#     if not updates:
-#         return jsonify({"error": "No valid fields to update"}), 400
-    
-#     values.append(unit_id)  # Add unit_id for WHERE clause
-    
-#     try:
-#         query = f"UPDATE units SET {', '.join(updates)} WHERE id = %s RETURNING id, name, race, class, level, armor, weapon"
-#         unit = execute_query(query, values, fetch_one=True)
-        
-#         if unit:
-#             return jsonify(unit), 200
-#         else:
-#             return jsonify({"error": "Unit not found"}), 404
-#     except Exception as e:
-#         return handle_error(e)
-
-# ============================
-# GAME DATA ENDPOINTS
-# ============================
-# These provide the dropdown options for unit creation/editing
 
 @app.route("/api/races", methods=["GET"])
 def get_races():
@@ -309,10 +273,10 @@ def get_latest_battle_report():
         LEFT JOIN squads w ON br.winner_squad_id = w.id
         LEFT JOIN squads l ON br.loser_squad_id = l.id
         ORDER BY br.created_at DESC
-        LIMIT 1
+        LIMIT %s
         """
         
-        report = execute_query(query, fetch_one=True)
+        report = execute_query(query, (BATTLE_REPORT_LIMIT,), fetch_one=True)
         
         if not report:
             return jsonify({

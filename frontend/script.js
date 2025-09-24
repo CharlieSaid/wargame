@@ -14,6 +14,10 @@ class WargameApp {
         // Configuration
         this.apiUrl = "https://wargame-mbpq.onrender.com/api";
         
+        // Game constants
+        this.MAX_UNITS_PER_SQUAD = 4;
+        this.API_TIMEOUT_MS = 5000;
+        
         // State tracking
         this.gameData = {}; // Cache for races, classes, armors, weapons
         this.unitCounter = 0; // For unique unit IDs in the form
@@ -112,7 +116,7 @@ class WargameApp {
         try {
             // Try to load from API with timeout
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+            const timeoutId = setTimeout(() => controller.abort(), this.API_TIMEOUT_MS);
             
             const [races, classes, armors, weapons] = await Promise.all([
                 fetch(`${this.apiUrl}/races`, { signal: controller.signal }).then(r => r.json()),
@@ -435,10 +439,10 @@ class WargameApp {
         /**
          * Add a new unit form to the units container
          */
-        // Check if we already have 4 units (limit)
+        // Check if we already have maximum units
         const existingUnits = document.querySelectorAll('.unit-form');
-        if (existingUnits.length >= 4) {
-            alert('Maximum of 4 units per squad allowed!');
+        if (existingUnits.length >= this.MAX_UNITS_PER_SQUAD) {
+            alert(`Maximum of ${this.MAX_UNITS_PER_SQUAD} units per squad allowed!`);
             return;
         }
         
@@ -521,12 +525,12 @@ class WargameApp {
         
         if (addUnitBtn) {
             const count = existingUnits.length;
-            if (count >= 4) {
-                addUnitBtn.textContent = `+ Add Unit (${count}/4) - MAX REACHED`;
+            if (count >= this.MAX_UNITS_PER_SQUAD) {
+                addUnitBtn.textContent = `+ Add Unit (${count}/${this.MAX_UNITS_PER_SQUAD}) - MAX REACHED`;
                 addUnitBtn.disabled = true;
                 addUnitBtn.style.opacity = '0.5';
             } else {
-                addUnitBtn.textContent = `+ Add Unit (${count}/4)`;
+                addUnitBtn.textContent = `+ Add Unit (${count}/${this.MAX_UNITS_PER_SQUAD})`;
                 addUnitBtn.disabled = false;
                 addUnitBtn.style.opacity = '1';
             }
@@ -606,8 +610,8 @@ class WargameApp {
         const units = this.collectUnitsData();
         
         // Validate unit count
-        if (units.length > 4) {
-            alert('Maximum of 4 units per squad allowed!');
+        if (units.length > this.MAX_UNITS_PER_SQUAD) {
+            alert(`Maximum of ${this.MAX_UNITS_PER_SQUAD} units per squad allowed!`);
             return;
         }
 

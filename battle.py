@@ -2,7 +2,11 @@ import datetime
 import random
 from db_utils import execute_sql
 
+# Battle system constants
 BATTLE_THRESHOLD = 2
+SQUADS_PER_BATTLE = 2 # I have no idea what would happen if this were to be changed.
+DICE_MAX_VALUE = 20
+LEVEL_INCREMENT = 1
 
 def count_squads():
     return execute_sql("SELECT COUNT(*) as squad_count FROM squads", fetch_one=True)['squad_count']
@@ -10,9 +14,6 @@ def count_squads():
 def select_random_squads(count):
     return execute_sql("SELECT id, name FROM squads ORDER BY RANDOM() LIMIT %s", fetch_all=True, params=(count,))
     
-def get_squad_by_id(squad_id):
-    return execute_sql("SELECT * FROM squads WHERE id = %s", fetch_one=True, params=(squad_id,))
-
 def get_squad_units(squad_id):
     return execute_sql("SELECT * FROM units WHERE squad_id = %s", fetch_all=True, params=(squad_id,))
 
@@ -128,11 +129,11 @@ def battle(squads):
             battle_report.append(f"{current_unit['name']} of {current_squad['name']} now attacks {target_unit['name']} of {target_squad_name}.")
 
             # Attack roll.
-            attack_roll = random.randint(1, 20)
+            attack_roll = random.randint(1, DICE_MAX_VALUE)
             battle_report.append(f"{current_unit['name']} rolls a {attack_roll} to attack {target_unit['name']}.")
 
             # Defense roll.
-            defense_roll = random.randint(1, 20)
+            defense_roll = random.randint(1, DICE_MAX_VALUE)
             battle_report.append(f"{target_unit['name']} rolls a {defense_roll} to defend against {current_unit['name']}.")
 
             attack_total = attack_roll + current_unit['attack_bonus']
@@ -175,8 +176,8 @@ def main():
     if squad_count >= BATTLE_THRESHOLD:
         print("Beginning battle...")
         
-        # Select 2 random squads to battle.
-        squads = select_random_squads(2)
+        # Select random squads to battle.
+        squads = select_random_squads(SQUADS_PER_BATTLE)
 
         # Begin the battle.
         battle_report, winner_squad_id, loser_squad_id = battle(squads)
@@ -208,8 +209,8 @@ def main():
         print(f"The loser is {loser_name}!")
         
         # Level up the winning squad
-        level_up_query = "UPDATE squads SET level = level + 1 WHERE id = %s"
-        execute_sql(level_up_query, params=(winner_squad_id,))
+        level_up_query = "UPDATE squads SET level = level + %s WHERE id = %s"
+        execute_sql(level_up_query, params=(LEVEL_INCREMENT, winner_squad_id))
         
         # Get the new level for confirmation
         new_level_result = execute_sql("SELECT level FROM squads WHERE id = %s", fetch_one=True, params=(winner_squad_id,))

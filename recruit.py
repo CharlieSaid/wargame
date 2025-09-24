@@ -3,7 +3,10 @@ import os
 import random
 from db_utils import execute_sql
 
+# Recruitment system constants
 RECRUIT_THRESHOLD = 20
+MAX_SQUADS = 5000
+UNITS_PER_SQUAD = 4
 
 def count_squads():
     return execute_sql("SELECT COUNT(*) as squad_count FROM squads", fetch_one=True)['squad_count']
@@ -89,8 +92,8 @@ def generate_squad():
     armors = [armor['name'] for armor in get_all_armors()]
     weapons = [weapon['name'] for weapon in get_all_weapons()]
     
-    # Generate 4 random units for the squad
-    num_units = 4
+    # Generate random units for the squad
+    num_units = UNITS_PER_SQUAD
     print(f"Creating {num_units} units for the squad...")
     
     for i in range(num_units):
@@ -114,8 +117,7 @@ def main():
     squad_count = count_squads()
     print(f"Squad count: {squad_count}")
     
-    # Check if we've hit the maximum squad limit (5,000)
-    MAX_SQUADS = 5000
+    # Check if we've hit the maximum squad limit
     if squad_count >= MAX_SQUADS:
         print(f"Squad count ({squad_count}) has reached the maximum limit ({MAX_SQUADS}). No new squads can be created.")
         print("Ending.")
