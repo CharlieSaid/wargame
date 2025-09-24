@@ -24,32 +24,41 @@ class WargameApp {
     }
 
     async init() {
-        console.log("Starting Wargame...");
+        console.log("🚀 Starting Wargame...");
         
         // Show loading state immediately
         this.showLoadingState();
         
         // Load data in parallel for better performance
         // Use Promise.allSettled to handle partial failures gracefully
+        console.log("⏳ Loading data in parallel...");
         const results = await Promise.allSettled([
             this.loadGameData(),
             this.loadSquads()
         ]);
+        
+        console.log("📋 Loading results:", results);
         
         // Check results and handle partial failures
         const gameDataSuccess = results[0].status === 'fulfilled';
         const squadsSuccess = results[1].status === 'fulfilled';
         
         if (!gameDataSuccess) {
-            console.warn("Game data failed to load, using fallback");
+            console.warn("❌ Game data failed to load, using fallback");
+            console.warn("Game data error:", results[0].reason);
+        } else {
+            console.log("✅ Game data loaded successfully");
         }
         if (!squadsSuccess) {
-            console.warn("Squads failed to load");
+            console.warn("❌ Squads failed to load");
+            console.warn("Squads error:", results[1].reason);
+        } else {
+            console.log("✅ Squads loaded successfully");
         }
         
         // Hide loading state
         this.hideLoadingState();
-        console.log("Wargame ready!");
+        console.log("🎉 Wargame ready!");
     }
     
     showLoadingState() {
@@ -151,29 +160,37 @@ class WargameApp {
          * Load top 5 squads and display them in the left column
          * Also update the total squad counter
          */
+        console.log("🔄 Starting to load squads...");
         try {
             // Add timeout to prevent hanging
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
             
+            console.log(`🌐 Fetching from: ${this.apiUrl}/squads`);
             const response = await fetch(`${this.apiUrl}/squads`, { signal: controller.signal });
             clearTimeout(timeoutId);
             
+            console.log(`📡 Response status: ${response.status} ${response.statusText}`);
+            
             if (response.ok) {
                 const allSquads = await response.json();
+                console.log(`📊 Received ${allSquads.length} squads from API:`, allSquads);
+                
                 // Update the total squad counter
                 this.updateSquadCounter(allSquads.length);
                 // Take only the first 5 squads
                 const topSquads = allSquads.slice(0, 5);
+                console.log(`🎯 Displaying top ${topSquads.length} squads:`, topSquads);
                 this.displaySquads(topSquads);
-                console.log(`Loaded ${topSquads.length} squads (showing top 5 of ${allSquads.length} total)`);
+                console.log(`✅ Loaded ${topSquads.length} squads (showing top 5 of ${allSquads.length} total)`);
             } else {
-                console.error("Failed to load squads");
+                console.error("❌ Failed to load squads - response not ok");
                 this.updateSquadCounter(0);
                 this.displaySquads([]);
             }
         } catch (error) {
-            console.error("Error loading squads:", error.message);
+            console.error("💥 Error loading squads:", error.message);
+            console.error("Error details:", error);
             this.updateSquadCounter(0);
             this.displaySquads([]);
         }
@@ -194,16 +211,26 @@ class WargameApp {
         /**
          * Display squads in the left column with click functionality
          */
+        console.log("🎨 Displaying squads:", squads);
         const squadsList = document.getElementById('squads-list');
+        
+        if (!squadsList) {
+            console.error("❌ Could not find squads-list element!");
+            return;
+        }
+        
+        console.log("📝 Found squads-list element, clearing content...");
         squadsList.innerHTML = '';
 
         if (squads.length === 0) {
+            console.log("📭 No squads to display, showing empty state");
             // Show empty state
             const emptyMessage = document.createElement('div');
             emptyMessage.className = 'placeholder-content';
             emptyMessage.innerHTML = 'No squads yet.<br>Create the first one!';
             squadsList.appendChild(emptyMessage);
         } else {
+            console.log(`🏗️ Creating ${squads.length} squad boxes...`);
             // Create squad boxes with click functionality
             squads.forEach(squad => {
                 const squadBox = document.createElement('div');
