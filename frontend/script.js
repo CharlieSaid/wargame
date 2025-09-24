@@ -25,9 +25,57 @@ class WargameApp {
 
     async init() {
         console.log("Starting Wargame...");
-        await this.loadGameData();
-        await this.loadSquads();
+        
+        // Show loading state immediately
+        this.showLoadingState();
+        
+        // Load data in parallel for better performance
+        // Use Promise.allSettled to handle partial failures gracefully
+        const results = await Promise.allSettled([
+            this.loadGameData(),
+            this.loadSquads()
+        ]);
+        
+        // Check results and handle partial failures
+        const gameDataSuccess = results[0].status === 'fulfilled';
+        const squadsSuccess = results[1].status === 'fulfilled';
+        
+        if (!gameDataSuccess) {
+            console.warn("Game data failed to load, using fallback");
+        }
+        if (!squadsSuccess) {
+            console.warn("Squads failed to load");
+        }
+        
+        // Hide loading state
+        this.hideLoadingState();
         console.log("Wargame ready!");
+    }
+    
+    showLoadingState() {
+        /**
+         * Show loading skeleton while data loads
+         */
+        const squadsList = document.getElementById('squads-list');
+        squadsList.innerHTML = `
+            <div class="loading-skeleton">
+                <div class="skeleton-squad"></div>
+                <div class="skeleton-squad"></div>
+                <div class="skeleton-squad"></div>
+                <div class="skeleton-squad"></div>
+                <div class="skeleton-squad"></div>
+            </div>
+        `;
+        
+        // Update counter to show loading
+        this.updateSquadCounter('Loading...');
+    }
+    
+    hideLoadingState() {
+        /**
+         * Hide loading skeleton
+         */
+        // Loading state will be replaced by actual data
     }
 
     // ============================
@@ -37,23 +85,44 @@ class WargameApp {
     async loadGameData() {
         /**
          * Load dropdown options for unit creation (races, classes, armors, weapons)
-         * Falls back to hardcoded data if API endpoints aren't available
+         * Uses caching and falls back to hardcoded data if API endpoints aren't available
          */
+        // Check cache first
+        const cacheKey = 'wargame-game-data';
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+            try {
+                this.gameData = JSON.parse(cached);
+                console.log("Game data loaded from cache");
+                return;
+            } catch (e) {
+                // Cache corrupted, continue with API
+            }
+        }
+        
         try {
-            // Try to load from API
+            // Try to load from API with timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+            
             const [races, classes, armors, weapons] = await Promise.all([
-                fetch(`${this.apiUrl}/races`).then(r => r.json()),
-                fetch(`${this.apiUrl}/classes`).then(r => r.json()),
-                fetch(`${this.apiUrl}/armors`).then(r => r.json()),
-                fetch(`${this.apiUrl}/weapons`).then(r => r.json())
+                fetch(`${this.apiUrl}/races`, { signal: controller.signal }).then(r => r.json()),
+                fetch(`${this.apiUrl}/classes`, { signal: controller.signal }).then(r => r.json()),
+                fetch(`${this.apiUrl}/armors`, { signal: controller.signal }).then(r => r.json()),
+                fetch(`${this.apiUrl}/weapons`, { signal: controller.signal }).then(r => r.json())
             ]);
             
+            clearTimeout(timeoutId);
+            
             this.gameData = { races, classes, armors, weapons };
-            console.log("Game data loaded from API");
+            
+            // Cache the data for next time
+            localStorage.setItem(cacheKey, JSON.stringify(this.gameData));
+            console.log("Game data loaded from API and cached");
             
         } catch (error) {
             // Use fallback data if API isn't available
-            console.log("Using fallback game data");
+            console.log("Using fallback game data due to error:", error.message);
             this.gameData = {
                 races: [
                     { name: 'Man' }, { name: 'Elf' }, { name: 'Dwarf' }, { name: 'Goblin' }
@@ -83,7 +152,13 @@ class WargameApp {
          * Also update the total squad counter
          */
         try {
-            const response = await fetch(`${this.apiUrl}/squads`);
+            // Add timeout to prevent hanging
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+            
+            const response = await fetch(`${this.apiUrl}/squads`, { signal: controller.signal });
+            clearTimeout(timeoutId);
+            
             if (response.ok) {
                 const allSquads = await response.json();
                 // Update the total squad counter
@@ -98,7 +173,7 @@ class WargameApp {
                 this.displaySquads([]);
             }
         } catch (error) {
-            console.error("Error loading squads:", error);
+            console.error("Error loading squads:", error.message);
             this.updateSquadCounter(0);
             this.displaySquads([]);
         }

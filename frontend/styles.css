@@ -9,7 +9,7 @@
    IMPORTS & CSS VARIABLES
    ============================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap');
+/* Google Fonts loaded via preload in HTML for better performance */
 
 :root {
     /* Color scheme */
@@ -334,6 +334,34 @@ select:focus {
     outline: none;
     border-width: 2px;
     background-color: white;
+}
+
+/* ============================
+   LOADING STATES
+   ============================ */
+
+.loading-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.skeleton-squad {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    height: 60px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
 }
 
 /* ============================
