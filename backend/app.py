@@ -172,7 +172,7 @@ def get_squad_units(squad_id):
     try:
         # Get units with their race's base HP
         query = """
-        SELECT u.id, u.name, u.race, u.class, u.armor, u.weapon, r.base_HP as hp
+        SELECT u.id, u.name, u.race, u.armor, u.weapon, r.base_HP as hp
         FROM units u
         LEFT JOIN races r ON u.race = r.name
         WHERE u.squad_id = %s 
@@ -189,14 +189,13 @@ def create_unit():
     data = request.get_json()
     
     # Validate input
-    validation_error = validate_required_fields(data, ["squad_id", "name", "class"])
+    validation_error = validate_required_fields(data, ["squad_id", "name"])
     if validation_error:
         return jsonify({"error": validation_error}), 400
     
     squad_id = data.get("squad_id")
     name = data.get("name")
     race = data.get("race")
-    unit_class = data.get("class")
     armor = data.get("armor")
     weapon = data.get("weapon")
     
@@ -208,10 +207,10 @@ def create_unit():
         if unit_count and unit_count['count'] >= MAX_UNITS_PER_SQUAD:
             return jsonify({"error": f"Squad already has the maximum of {MAX_UNITS_PER_SQUAD} units"}), 400
         
-        query = """INSERT INTO units (squad_id, name, race, class, armor, weapon) 
-                   VALUES (%s, %s, %s, %s, %s, %s) 
-                   RETURNING id, name, race, class, armor, weapon"""
-        unit = execute_query(query, (squad_id, name, race, unit_class, armor, weapon), fetch_one=True)
+        query = """INSERT INTO units (squad_id, name, race, armor, weapon) 
+                   VALUES (%s, %s, %s, %s, %s) 
+                   RETURNING id, name, race, armor, weapon"""
+        unit = execute_query(query, (squad_id, name, race, armor, weapon), fetch_one=True)
         return jsonify(unit), 201
     except Exception as e:
         return handle_error(e)
@@ -224,16 +223,6 @@ def get_races():
         query = "SELECT name, skill, base_HP, base_speed, description FROM races ORDER BY name"
         races = execute_query(query, fetch_all=True)
         return jsonify(races), 200
-    except Exception as e:
-        return handle_error(e)
-
-@app.route("/api/classes", methods=["GET"])
-def get_classes():
-    """Get all available classes for unit creation"""
-    try:
-        query = "SELECT name, skill, description FROM classes ORDER BY name"
-        classes = execute_query(query, fetch_all=True)
-        return jsonify(classes), 200
     except Exception as e:
         return handle_error(e)
 

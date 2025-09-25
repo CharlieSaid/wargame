@@ -19,7 +19,7 @@ class WargameApp {
         this.API_TIMEOUT_MS = 5000;
         
         // State tracking
-        this.gameData = {}; // Cache for races, classes, armors, weapons
+        this.gameData = {}; // Cache for races, armors, weapons
         this.unitCounter = 0; // For unique unit IDs in the form
         this.selectedSquad = null; // Currently selected squad
         
@@ -97,7 +97,7 @@ class WargameApp {
     
     async loadGameData() {
         /**
-         * Load dropdown options for unit creation (races, classes, armors, weapons)
+         * Load dropdown options for unit creation (races, armors, weapons)
          * Uses caching and falls back to hardcoded data if API endpoints aren't available
          */
         // Check cache first
@@ -118,16 +118,15 @@ class WargameApp {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), this.API_TIMEOUT_MS);
             
-            const [races, classes, armors, weapons] = await Promise.all([
+            const [races, armors, weapons] = await Promise.all([
                 fetch(`${this.apiUrl}/races`, { signal: controller.signal }).then(r => r.json()),
-                fetch(`${this.apiUrl}/classes`, { signal: controller.signal }).then(r => r.json()),
                 fetch(`${this.apiUrl}/armors`, { signal: controller.signal }).then(r => r.json()),
                 fetch(`${this.apiUrl}/weapons`, { signal: controller.signal }).then(r => r.json())
             ]);
             
             clearTimeout(timeoutId);
             
-            this.gameData = { races, classes, armors, weapons };
+            this.gameData = { races, armors, weapons };
             
             // Cache the data for next time
             localStorage.setItem(cacheKey, JSON.stringify(this.gameData));
@@ -139,11 +138,6 @@ class WargameApp {
             this.gameData = {
                 races: [
                     { name: 'Man' }, { name: 'Elf' }, { name: 'Dwarf' }, { name: 'Goblin' }
-                ],
-                classes: [
-                    { name: 'Basic' }, { name: 'Berzerker' }, { name: 'Rogue' }, 
-                    { name: 'Battlemage' }, { name: 'Auramancer' }, { name: 'Healing Mage' }, 
-                    { name: 'Commander' }, { name: 'Hero' }
                 ],
                 armors: [
                     { name: 'None' }, { name: 'Light' }, { name: 'Medium' }, { name: 'Heavy' }
@@ -373,7 +367,6 @@ class WargameApp {
                     <div class="unit-name">${unit.name || 'Unnamed Unit'}</div>
                     <div class="unit-details">
                         <div class="unit-detail"><strong>Race:</strong> ${unit.race || 'None'}</div>
-                        <div class="unit-detail"><strong>Class:</strong> ${unit.class || 'Basic'}</div>
                         <div class="unit-detail"><strong>Armor:</strong> ${unit.armor || 'None'}</div>
                         <div class="unit-detail"><strong>Weapon:</strong> ${unit.weapon || 'None'}</div>
                         <div class="unit-detail"><strong>HP:</strong> ${unit.hp || 'N/A'}</div>
@@ -467,14 +460,6 @@ class WargameApp {
                     <select id="${unitId}-race">
                         <option value="">Select Race</option>
                         ${this.generateOptions(this.gameData.races)}
-                    </select>
-                </div>
-                
-                <div class="attribute-group">
-                    <label for="${unitId}-class">Class:</label>
-                    <select id="${unitId}-class">
-                        <option value="">Select Class</option>
-                        ${this.generateOptions(this.gameData.classes)}
                     </select>
                 </div>
                 
@@ -646,7 +631,6 @@ class WargameApp {
                             squad_id: createdSquad.id,
                             name: unit.name,
                             race: unit.race || null,
-                            class: unit.class || 'Basic',
                             armor: unit.armor || null,
                             weapon: unit.weapon || null
                         })
@@ -689,7 +673,6 @@ class WargameApp {
                 units.push({
                     name: name,
                     race: document.getElementById(`${unitId}-race`).value,
-                    class: document.getElementById(`${unitId}-class`).value,
                     armor: document.getElementById(`${unitId}-armor`).value,
                     weapon: document.getElementById(`${unitId}-weapon`).value
                 });

@@ -4,18 +4,6 @@ INSERT INTO races (name, skill, base_HP, base_speed, base_agility, base_damage, 
     ('Dwarf', 'Strength of Stone', 130, 8, 80, 12, 'Dwarves'),
     ('Goblin', 'Blind Rage', 60, 15, 110, 9, 'Goblins are small, muscular, but frail-boned.  They are not the brightest of beings, and rely on instinct more than thought.');
 
-INSERT INTO classes (name, skill) VALUES
-    ('Basic', NULL),
-    ('Knight', 'Vows of Honor'),
-    ('Marksman', 'Keen Aim'),
-    ('Berzerker', 'Berzerk'),
-    ('Rogue', 'Stealth'),
-    ('Battlemage', 'Magic Attacks'),
-    ('Auramancer', 'Aura Boost'),
-    ('Healing Mage', 'Healing'),
-    ('Commander', 'Leadership'),
-    ('Hero', 'Heroic Feat');
-
 INSERT INTO armors (name, defense_bonus, weight, description) VALUES
     ('Literally Nothing', 0, 0, 'No armor'),
     ('Ornamental Robes', 1, 0, 'Look fancy, but offer about as much protection as you would expect.'),
@@ -56,29 +44,29 @@ INSERT INTO squads (name, commander, description) VALUES
     ('Falcon Knights', 'default', 'A squad of Falcon Knights.'),
     ('Moonblessed Elves', 'default', 'A kingdom of elves living high in the mountains who worship the moon..');
 
-INSERT INTO units (squad_id, name, race, class, armor, weapon, description) VALUES
-    (1, 'George', 'Man', 'Basic', 'Gambison', 'Infantry Sword', 'An infantry soldier of the Lion Knights.'),
-    (1, 'Henrik', 'Man', 'Basic', 'Gambison', 'Infantry Sword', 'An infantry soldier of the Lion Knights.'),
-    (1, 'Melvedar', 'Man', 'Battlemage', 'Enchanted Wizard Robes', 'None', 'A battlemage of the Lion Knights.'),
-    (1, 'Will', 'Man', 'Knight', 'Plate Armor', 'Infantry Sword', 'A knight of the Lion Knights.'),
-    (2, 'Durrennal', 'Dwarf', 'Basic', 'Dwarf Mail', 'Dwarven Greatsword', 'A dwarf soldier.'),
-    (2, 'Goreggel', 'Dwarf', 'Basic', 'Dwarf Mail', 'Dwarven Battleaxe', 'A dwarf soldier.'),
-    (2, 'Nurhallen', 'Dwarf', 'Marksman', 'Dwarf Mail', 'Dwarven Crossbow', 'A dwarf crossbowman.'),
-    (2, 'Ahlarromen', 'Dwarf', 'Berzerker', 'Literally Nothing', 'Bone Club', 'A dwarf berzerker.'),
-    (3, 'Nug', 'Goblin', 'Basic', 'Literally Nothing', 'Goblin Spear', 'A goblin soldier.'),
-    (3, 'Haj', 'Goblin', 'Basic', 'Literally Nothing', 'Goblin Spear', 'A goblin soldier.'),
-    (3, 'Nek', 'Goblin', 'Basic', 'Literally Nothing', 'Goblin Spear', 'A goblin soldier.'),
-    (3, 'Org', 'Goblin', 'Rogue', 'Leather Armor', 'Goblin Dagger', 'A goblin assasin.'),
-    (4, 'Kelawill', 'Elf', 'Basic', 'Elf Weave', 'Elf Blade', 'An elf soldier.'),
-    (4, 'Forlandin', 'Elf', 'Basic', 'Elf Weave', 'Elf Blade', 'An elf soldier.'),
-    (4, 'Grasbell', 'Elf', 'Battlemage', 'Plate Armor', 'Longsword', 'An elf battlemage.'),
-    (4, 'Urthalen', 'Elf', 'Auramancer', 'Enchanted Wizard Robes', 'None', 'An elf auramancer.'),
-    (5, 'Friedman', 'Man', 'Knight', 'Chainmail', 'Longsword', 'A falcon knight.'),
-    (5, 'Ned', 'Man', 'Knight', 'Chainmail', 'Longsword', 'A falcon knight.'),
-    (5, 'Edvard', 'Man', 'Knight', 'Chainmail', 'Battleaxe', 'A falcon knight.'),
-    (5, 'Jamieson', 'Man', 'Knight', 'Plate Armor', 'Longbow', 'A falcon knight.'),
-    (6, 'Moonstone', 'Elf', 'Battlemage', 'Elf Weave', 'Elf Bow', 'An elf soldier.'),
-    (6, 'Moonbeam', 'Elf', 'Battlemage', 'Elf Weave', 'Elf Blade', 'An elf soldier.'),
-    (6, 'Mooncrest', 'Elf', 'Battlemage', 'Elf Weave', 'Elf Blade', 'An elf soldier.'),
-    (6, 'Moonlight', 'Elf', 'Battlemage', 'Elf Weave', 'Greatsword', 'An elf captain.');
+INSERT INTO units (squad_id, name, race, armor, weapon, description) VALUES
+    (1, 'George', 'Man', 'Gambison', 'Infantry Sword', 'An infantry soldier of the Lion Knights.'),
+    (1, 'Henrik', 'Man', 'Gambison', 'Infantry Sword', 'An infantry soldier of the Lion Knights.'),
+    (1, 'Melvedar', 'Man', 'Enchanted Wizard Robes', 'None', 'A battlemage of the Lion Knights.'),
+    (1, 'Will', 'Man', 'Plate Armor', 'Infantry Sword', 'A knight of the Lion Knights.'),
+    (2, 'Durrennal', 'Dwarf', 'Dwarf Mail', 'Dwarven Greatsword', 'A dwarf soldier.'),
+    (2, 'Goreggel', 'Dwarf', 'Dwarf Mail', 'Dwarven Battleaxe', 'A dwarf soldier.'),
+    (2, 'Nurhallen', 'Dwarf', 'Dwarf Mail', 'Dwarven Crossbow', 'A dwarf crossbowman.'),
+    (2, 'Ahlarromen', 'Dwarf', 'Literally Nothing', 'Bone Club', 'A dwarf berzerker.'),
+    (3, 'Nug', 'Goblin', 'Literally Nothing', 'Goblin Spear', 'A goblin soldier.'),
+    (3, 'Haj', 'Goblin', 'Literally Nothing', 'Goblin Spear', 'A goblin soldier.'),
+    (3, 'Nek', 'Goblin', 'Literally Nothing', 'Goblin Spear', 'A goblin soldier.'),
+    (3, 'Org', 'Goblin', 'Leather Armor', 'Goblin Dagger', 'A goblin assasin.'),
+    (4, 'Kelawill', 'Elf', 'Elf Weave', 'Elf Blade', 'An elf soldier.'),
+    (4, 'Forlandin', 'Elf', 'Elf Weave', 'Elf Blade', 'An elf soldier.'),
+    (4, 'Grasbell', 'Elf', 'Plate Armor', 'Longsword', 'An elf battlemage.'),
+    (4, 'Urthalen', 'Elf', 'Enchanted Wizard Robes', 'None', 'An elf auramancer.'),
+    (5, 'Friedman', 'Man', 'Chainmail', 'Longsword', 'A falcon knight.'),
+    (5, 'Ned', 'Man', 'Chainmail', 'Longsword', 'A falcon knight.'),
+    (5, 'Edvard', 'Man', 'Chainmail', 'Battleaxe', 'A falcon knight.'),
+    (5, 'Jamieson', 'Man', 'Plate Armor', 'Longbow', 'A falcon knight.'),
+    (6, 'Moonstone', 'Elf', 'Elf Weave', 'Elf Bow', 'An elf soldier.'),
+    (6, 'Moonbeam', 'Elf', 'Elf Weave', 'Elf Blade', 'An elf soldier.'),
+    (6, 'Mooncrest', 'Elf', 'Elf Weave', 'Elf Blade', 'An elf soldier.'),
+    (6, 'Moonlight', 'Elf', 'Elf Weave', 'Greatsword', 'An elf captain.');
 

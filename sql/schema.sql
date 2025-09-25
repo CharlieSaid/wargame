@@ -13,15 +13,6 @@ CREATE TABLE races (
     description VARCHAR(1000)
 );
 
--- Classes table: Each class that a unit can be
--- skill is a label that determines special abilities
-CREATE TABLE classes (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(50) NOT NULL UNIQUE,
-    skill VARCHAR(50),
-    description VARCHAR(1000)
-);
-
 -- Armors table: Each armor that a unit can use
 -- defense_bonus is the amount that the armor reduces incoming damage by
 -- weight is the amount of weight that the armor adds to the unit
@@ -63,7 +54,6 @@ CREATE TABLE units (
     squad_id INTEGER NOT NULL REFERENCES squads(id) ON DELETE CASCADE,
     name VARCHAR(100) NOT NULL,
     race VARCHAR(50) REFERENCES races(name),
-    class VARCHAR(50) NOT NULL REFERENCES classes(name),
     armor VARCHAR(50) REFERENCES armors(name),
     weapon VARCHAR(50) REFERENCES weapons(name),
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
@@ -83,7 +73,6 @@ CREATE TABLE battle_reports (
 -- PostgreSQL indexes for better query performance
 CREATE INDEX idx_units_squad_id ON units(squad_id);
 CREATE INDEX idx_units_race ON units(race);
-CREATE INDEX idx_units_class ON units(class);
 CREATE INDEX idx_units_armor ON units(armor);
 CREATE INDEX idx_units_weapon ON units(weapon);
 CREATE INDEX idx_squads_level ON squads(level);

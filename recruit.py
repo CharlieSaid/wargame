@@ -14,9 +14,6 @@ def count_squads():
 def get_all_races():
     return execute_sql("SELECT name FROM races", fetch_all=True)
 
-def get_all_classes():
-    return execute_sql("SELECT name FROM classes", fetch_all=True)
-
 def get_all_armors():
     return execute_sql("SELECT name FROM armors", fetch_all=True)
 
@@ -31,11 +28,11 @@ def create_squad(name, commander, description):
         params=(name, commander, description)
     )
 
-def create_unit(squad_id, name, race, unit_class, armor, weapon):
+def create_unit(squad_id, name, race, armor, weapon):
     """Create a new unit for a squad"""
     return execute_sql(
-        "INSERT INTO units (squad_id, name, race, class, armor, weapon) VALUES (%s, %s, %s, %s, %s, %s)",
-        params=(squad_id, name, race, unit_class, armor, weapon)
+        "INSERT INTO units (squad_id, name, race, armor, weapon) VALUES (%s, %s, %s, %s, %s)",
+        params=(squad_id, name, race, armor, weapon)
     )
 
 def generate_squad_name():
@@ -88,7 +85,6 @@ def generate_squad():
     
     # Get all available options for random selection
     races = [race['name'] for race in get_all_races()]
-    classes = [cls['name'] for cls in get_all_classes()]
     armors = [armor['name'] for armor in get_all_armors()]
     weapons = [weapon['name'] for weapon in get_all_weapons()]
     
@@ -99,13 +95,12 @@ def generate_squad():
     for i in range(num_units):
         unit_name = generate_unit_name()
         race = random.choice(races)
-        unit_class = random.choice(classes)
         armor = random.choice(armors)
         weapon = random.choice(weapons)
         
         # Create the unit
-        create_unit(squad_id, unit_name, race, unit_class, armor, weapon)
-        print(f"  Created unit: {unit_name} - {race} {unit_class} wearing {armor} and wielding {weapon}")
+        create_unit(squad_id, unit_name, race, armor, weapon)
+        print(f"  Created unit: {unit_name} - {race} wearing {armor} and wielding {weapon}")
     
     print(f"Squad {squad_name} recruitment complete!")
     return True
