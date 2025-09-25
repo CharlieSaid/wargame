@@ -1,7 +1,7 @@
 import datetime
 import os
 import random
-from db_utils import execute_sql
+from db_utils import execute_sql, execute_transaction_with_results
 
 # Recruitment system constants
 RECRUIT_THRESHOLD = 20
@@ -20,20 +20,56 @@ def get_all_armors():
 def get_all_weapons():
     return execute_sql("SELECT name FROM weapons", fetch_all=True)
 
-def create_squad(name, commander, description):
-    """Create a new squad and return its ID"""
-    return execute_sql(
-        "INSERT INTO squads (name, commander, description) VALUES (%s, %s, %s) RETURNING id",
-        fetch_one=True,
-        params=(name, commander, description)
-    )
-
-def create_unit(squad_id, name, race, armor, weapon):
-    """Create a new unit for a squad"""
-    return execute_sql(
-        "INSERT INTO units (squad_id, name, race, armor, weapon) VALUES (%s, %s, %s, %s, %s)",
-        params=(squad_id, name, race, armor, weapon)
-    )
+def create_squad_with_units_atomically(name, commander, description, units_data):
+    """
+    Create a squad and all its units in a single atomic transaction.
+    Either all operations succeed, or none do.
+    
+    Args:
+        name: Squad name
+        commander: Squad commander
+        description: Squad description
+        units_data: List of dicts with unit data (name, race, armor, weapon)
+    
+    Returns:
+        Squad ID if successful, None if failed
+    """
+    # Prepare all operations for the transaction
+    operations = []
+    
+    # 1. Create the squad
+    squad_sql = "INSERT INTO squads (name, commander, description) VALUES (%s, %s, %s) RETURNING id"
+    operations.append((squad_sql, (name, commander, description), 'one'))
+    
+    # 2. Create all units (we'll need the squad_id from the first operation)
+    # We'll handle this by using a subquery or by doing it in two steps
+    
+    # Execute the transaction
+    results = execute_transaction_with_results(operations, "Failed to create squad atomically")
+    
+    if results is None:
+        return None
+    
+    squad_result = results[0]
+    if not squad_result:
+        return None
+    
+    squad_id = squad_result['id']
+    
+    # Now create all units in a second transaction
+    unit_operations = []
+    for unit_data in units_data:
+        unit_sql = "INSERT INTO units (squad_id, name, race, armor, weapon) VALUES (%s, %s, %s, %s, %s)"
+        unit_operations.append((unit_sql, (squad_id, unit_data['name'], unit_data['race'], unit_data['armor'], unit_data['weapon'])))
+    
+    unit_results = execute_transaction_with_results(unit_operations, "Failed to create units atomically")
+    
+    if unit_results is None:
+        # If unit creation failed, we should clean up the squad
+        execute_sql("DELETE FROM squads WHERE id = %s", params=(squad_id,), error_message="Failed to clean up orphaned squad")
+        return None
+    
+    return squad_id
 
 def generate_squad_name():
     """Generate a random squad name"""
@@ -66,7 +102,7 @@ def generate_unit_name():
     return random.choice(first_names)
 
 def generate_squad():
-    """Generate a random squad with units"""
+    """Generate a random squad with units atomically"""
     print("Generating new squad...")
     
     # Generate squad details
@@ -74,33 +110,37 @@ def generate_squad():
     commander = "System Recruiter"
     description = f"A generated squad created by the recruitment system on {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
     
-    # Create the squad
-    squad_result = create_squad(squad_name, commander, description)
-    if not squad_result:
-        print("Failed to create squad")
-        return False
-    
-    squad_id = squad_result['id']
-    print(f"Created squad: {squad_name} (ID: {squad_id})")
-    
     # Get all available options for random selection
     races = [race['name'] for race in get_all_races()]
     armors = [armor['name'] for armor in get_all_armors()]
     weapons = [weapon['name'] for weapon in get_all_weapons()]
     
     # Generate random units for the squad
-    num_units = UNITS_PER_SQUAD
-    print(f"Creating {num_units} units for the squad...")
-    
-    for i in range(num_units):
+    units_data = []
+    for i in range(UNITS_PER_SQUAD):
         unit_name = generate_unit_name()
         race = random.choice(races)
         armor = random.choice(armors)
         weapon = random.choice(weapons)
         
-        # Create the unit
-        create_unit(squad_id, unit_name, race, armor, weapon)
-        print(f"  Created unit: {unit_name} - {race} wearing {armor} and wielding {weapon}")
+        units_data.append({
+            'name': unit_name,
+            'race': race,
+            'armor': armor,
+            'weapon': weapon
+        })
+    
+    # Create squad and all units atomically
+    squad_id = create_squad_with_units_atomically(squad_name, commander, description, units_data)
+    
+    if not squad_id:
+        print("Failed to create squad and units atomically")
+        return False
+    
+    print(f"Created squad: {squad_name} (ID: {squad_id})")
+    print(f"Created {len(units_data)} units:")
+    for unit_data in units_data:
+        print(f"  - {unit_data['name']} ({unit_data['race']}) wearing {unit_data['armor']} and wielding {unit_data['weapon']}")
     
     print(f"Squad {squad_name} recruitment complete!")
     return True

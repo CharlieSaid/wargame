@@ -1,6 +1,6 @@
 import datetime
 import random
-from db_utils import execute_sql
+from db_utils import execute_sql, execute_transaction_with_results
 
 # Battle system constants
 BATTLE_THRESHOLD = 2
@@ -55,6 +55,10 @@ def battle(squads):
 
     squad1_id = squads[0]['id']
     squad2_id = squads[1]['id']
+    
+    # Initialize winner/loser variables
+    winner_squad_id = None
+    loser_squad_id = None
 
     # Get the units for each squad.
     squad1_units = get_squad_units(squad1_id)
@@ -66,6 +70,9 @@ def battle(squads):
         unit['health'] = calculate_health(unit, None, 0)
         unit['attack_bonus'] = get_weapon_stats(unit['weapon'])['damage'] + get_race_stats(unit['race'])['base_damage']
         unit['defense_bonus'] = get_armor_stats(unit['armor'])['defense_bonus']
+        print(unit)
+
+    
 
     # # Construct a list of all units' id, squad_id and effective speed.
     # turn_order = [
@@ -84,11 +91,11 @@ def battle(squads):
     # List each unit in each squad.
     battle_report.append(f"{squads[0]['name']} has {len(squad1_units)} units...")
     for unit in squad1_units:
-        battle_report.append(f"{unit['name']} - {unit['race']} {unit['class']} wearing {unit['armor']} and wielding {unit['weapon']}")
+        battle_report.append(f"{unit['name']} - {unit['race']} wearing {unit['armor']} and wielding {unit['weapon']}")
 
     battle_report.append(f"{squads[1]['name']} has {len(squad2_units)} units...")
     for unit in squad2_units:
-        battle_report.append(f"{unit['name']} - {unit['race']} {unit['class']} wearing {unit['armor']} and wielding {unit['weapon']}")
+        battle_report.append(f"{unit['name']} - {unit['race']} wearing {unit['armor']} and wielding {unit['weapon']}")
 
     battle_report.append("The battle begins!")
 
@@ -163,7 +170,52 @@ def battle(squads):
 
     battle_report.append("The battle is over!")
 
+    # Safety check - ensure we have valid winner/loser
+    if winner_squad_id is None or loser_squad_id is None:
+        battle_report.append("ERROR: Battle ended without a clear winner!")
+        print("ERROR: Battle ended without a clear winner!")
+        # Default to first squad as winner if something went wrong
+        winner_squad_id = squad1_id
+        loser_squad_id = squad2_id
+
     return battle_report, winner_squad_id, loser_squad_id
+
+def complete_battle_atomically(winner_squad_id, loser_squad_id, battle_report_content, battle_timestamp):
+    """
+    Complete a battle by storing the report, leveling up the winner, and deleting the loser atomically.
+    Either all operations succeed, or none do.
+    
+    Args:
+        winner_squad_id: ID of the winning squad
+        loser_squad_id: ID of the losing squad
+        battle_report_content: The battle report text
+        battle_timestamp: When the battle occurred
+    
+    Returns:
+        True if successful, False if failed
+    """
+    # Prepare all operations for the transaction
+    operations = [
+        # 1. Insert battle report
+        ("INSERT INTO battle_reports (winner_squad_id, loser_squad_id, report_content, battle_timestamp) VALUES (%s, %s, %s, %s)", 
+         (winner_squad_id, loser_squad_id, battle_report_content, battle_timestamp)),
+        
+        # 2. Level up the winning squad
+        ("UPDATE squads SET level = level + %s WHERE id = %s", 
+         (LEVEL_INCREMENT, winner_squad_id)),
+        
+        # 3. Delete the losing squad (this will cascade delete all units)
+        ("DELETE FROM squads WHERE id = %s", 
+         (loser_squad_id,))
+    ]
+    
+    # Execute the transaction
+    results = execute_transaction_with_results(operations, "Failed to complete battle atomically")
+    
+    if results is None:
+        return False
+    
+    return True
 
 def main():
     print("Checking number of squads...")
@@ -182,43 +234,28 @@ def main():
         # Begin the battle.
         battle_report, winner_squad_id, loser_squad_id = battle(squads)
 
-        # Store the battle report in the database instead of files
-        report_content = '\n'.join(battle_report)
-        
-        # Insert battle report into database
-        insert_query = """
-        INSERT INTO battle_reports (winner_squad_id, loser_squad_id, report_content, battle_timestamp)
-        VALUES (%s, %s, %s, %s)
-        RETURNING id
-        """
-        
-        battle_timestamp = datetime.datetime.now()
-        report_id = execute_sql(
-            insert_query, 
-            fetch_one=True, 
-            params=(winner_squad_id, loser_squad_id, report_content, battle_timestamp)
-        )
-        
-        print(f"Battle report saved to database with ID: {report_id['id']}")
-        
-        # Get winner and loser names
+        # Get winner and loser names BEFORE the atomic transaction
         winner_name = execute_sql('SELECT name FROM squads WHERE id = %s', fetch_one=True, params=(winner_squad_id,))['name']
         loser_name = execute_sql('SELECT name FROM squads WHERE id = %s', fetch_one=True, params=(loser_squad_id,))['name']
         
-        print(f"The winner is {winner_name}!")
-        print(f"The loser is {loser_name}!")
+        # Complete the battle atomically
+        battle_timestamp = datetime.datetime.now()
+        report_content = '\n'.join(battle_report)
         
-        # Level up the winning squad
-        level_up_query = "UPDATE squads SET level = level + %s WHERE id = %s"
-        execute_sql(level_up_query, params=(LEVEL_INCREMENT, winner_squad_id))
+        success = complete_battle_atomically(winner_squad_id, loser_squad_id, report_content, battle_timestamp)
+        
+        if not success:
+            print("ERROR: Failed to complete battle atomically!")
+            return
+        
+        print(f"Battle completed successfully!")
+        print(f"The winner is {winner_name}!")
+        print(f"The loser {loser_name} has been eliminated!")
         
         # Get the new level for confirmation
         new_level_result = execute_sql("SELECT level FROM squads WHERE id = %s", fetch_one=True, params=(winner_squad_id,))
         new_level = new_level_result['level'] if new_level_result else 'unknown'
         print(f"{winner_name} leveled up to level {new_level}!")
-        
-        # Drop the losing squad from the database
-        execute_sql("DELETE FROM squads WHERE id = %s", params=(loser_squad_id,))
 
     print("Ending.")
 

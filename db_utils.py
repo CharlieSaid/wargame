@@ -1,6 +1,6 @@
 """
 Shared database utilities for the wargame application.
-Centralizes database connection and query execution.
+Centralizes database connection and query execution with transaction support.
 """
 
 import os
@@ -49,4 +49,73 @@ def execute_sql(sql, params=None, fetch_one=False, fetch_all=False, error_messag
             print(f"{error_message}: {e}")
         else:
             print(f"Database error: {e}")
+        return None
+
+def execute_transaction(operations, error_message="Transaction failed"):
+    """
+    Execute multiple database operations in a single transaction.
+    If any operation fails, the entire transaction is rolled back.
+    
+    Args:
+        operations: List of tuples (sql, params)
+        error_message: Custom error message for logging
+    
+    Returns:
+        List of results from each operation, or None if transaction failed
+    """
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor() as cursor:
+                results = []
+                for sql, params in operations:
+                    cursor.execute(sql, params)
+                    # For INSERT/UPDATE/DELETE, get rowcount
+                    # For SELECT, we'd need to handle differently
+                    if sql.strip().upper().startswith('SELECT'):
+                        results.append(cursor.fetchall())
+                    else:
+                        results.append(cursor.rowcount)
+                
+                conn.commit()
+                return results
+    except Exception as e:
+        print(f"{error_message}: {e}")
+        return None
+
+def execute_transaction_with_results(operations, error_message="Transaction failed"):
+    """
+    Execute multiple database operations in a single transaction with detailed results.
+    Each operation can specify whether to fetch results.
+    
+    Args:
+        operations: List of tuples (sql, params, fetch_type) where fetch_type is 'one', 'all', or None
+        error_message: Custom error message for logging
+    
+    Returns:
+        List of results from each operation, or None if transaction failed
+    """
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor() as cursor:
+                results = []
+                for operation in operations:
+                    if len(operation) == 2:
+                        sql, params = operation
+                        fetch_type = None
+                    else:
+                        sql, params, fetch_type = operation
+                    
+                    cursor.execute(sql, params)
+                    
+                    if fetch_type == 'one':
+                        results.append(cursor.fetchone())
+                    elif fetch_type == 'all':
+                        results.append(cursor.fetchall())
+                    else:
+                        results.append(cursor.rowcount)
+                
+                conn.commit()
+                return results
+    except Exception as e:
+        print(f"{error_message}: {e}")
         return None
