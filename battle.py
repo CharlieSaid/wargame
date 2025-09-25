@@ -84,11 +84,11 @@ def battle(squads):
     # List each unit in each squad.
     battle_report.append(f"{squads[0]['name']} has {len(squad1_units)} units...")
     for unit in squad1_units:
-        battle_report.append(f"{unit['name']} - {unit['race']} {unit['class']} (level {unit['level']}) wearing {unit['armor']} and wielding {unit['weapon']}")
+        battle_report.append(f"{unit['name']} - {unit['race']} {unit['class']} wearing {unit['armor']} and wielding {unit['weapon']}")
 
     battle_report.append(f"{squads[1]['name']} has {len(squad2_units)} units...")
     for unit in squad2_units:
-        battle_report.append(f"{unit['name']} - {unit['race']} {unit['class']} (level {unit['level']}) wearing {unit['armor']} and wielding {unit['weapon']}")
+        battle_report.append(f"{unit['name']} - {unit['race']} {unit['class']} wearing {unit['armor']} and wielding {unit['weapon']}")
 
     battle_report.append("The battle begins!")
 
